@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  IN_PROGRESS
+  CANCELLED
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum SubTaskState {
+  IN_PROGRESS
+  DONE
+}
+
+enum RoomRole {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id       String @id @default(uuid())
+  fullName String @map("full_name")
+  email    String @unique
+  password String
+
+  roomMembers RoomMember[]
+
+  @@map("user")
+}
+
+model Room {
+  id          String  @id
+  name        String
+  description String?
+
+  tasks       Task[]
+  roomMembers RoomMember[]
+  taskTypes   TaskType[]
+  awards      Award[]
+
+  @@map("room")
+}
+
+model RoomMember {
+  id               String   @id @default(uuid())
+  role             RoomRole
+  joinedAt         DateTime @default(now()) @map("joined_at")
+  accumulatedScore Int      @default(0) @map("accumulated_score")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  roomId String @map("room_id")
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  comment Comment[]
+
+  performTasks   Task[]  @relation("user_perform_task")
+  receivedAwards Award[] @relation("receive_awards")
+
+  @@unique([userId, roomId])
+  @@map("room_member")
+}
+
+model TaskType {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  tasks Task[]
+
+  roomId String @map("room_id")
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  @@unique([name, roomId])
+  @@map("task_type")
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  priority    TaskPriority
+  status      TaskStatus   @default(IN_PROGRESS)
+  startDate   DateTime     @map("start_date")
+  dueDate     DateTime     @map("due_date")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @default(now()) @map("updated_at")
+  score       Int
+
+  subTasks SubTask[]
+  comments Comment[]
+
+  roomId String @map("room_id")
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  taskTypeId String   @map("task_type_id")
+  taskType   TaskType @relation(fields: [taskTypeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  performers RoomMember[] @relation("user_perform_task")
+
+  @@map("task")
+}
+
+model SubTask {
+  id          String       @id @default(uuid())
+  description String
+  state       SubTaskState @default(IN_PROGRESS)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @default(now()) @map("updated_at")
+
+  taskId String @map("task_id")
+  task   Task   @relation(fields: [taskId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@map("sub_task")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  taskId String @map("task_id")
+  task   Task   @relation(fields: [taskId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  commentatorId String     @map("commentator_id")
+  commentator   RoomMember @relation(fields: [commentatorId], references: [id])
+
+  @@map("comment")
+}
+
+model Award {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  minScore    Int    @map("min_score")
+
+  roomId String @map("room_id")
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  awardReceivers RoomMember[] @relation("receive_awards")
+
+  @@map("award")
+}

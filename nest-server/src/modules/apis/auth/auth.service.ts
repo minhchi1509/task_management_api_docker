@@ -1,0 +1,158 @@
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { IEnvironmentVariables } from 'src/common/types/env.type';
+import { TResetPasswordMailData } from 'src/common/types/mail.type';
+import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
+import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
+import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
+import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
+import { SendResetPasswordMailResponseDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailResponse.dto';
+import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dto';
+import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
+import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
+import { JobQueueService } from 'src/modules/libs/job-queue/job-queue.service';
+import { JwtUtilsService } from 'src/modules/libs/jwt-utils/jwt-utils.service';
+import {
+  TJWTPayload,
+  TJWTResetPasswordPayload
+} from 'src/modules/libs/jwt-utils/types/jwt.type';
+import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
+import { RedisUtilsService } from 'src/modules/libs/redis/redis-utils.service';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private configService: ConfigService<IEnvironmentVariables>,
+    private prismaService: PrismaService,
+    private jwtUtilsService: JwtUtilsService,
+    private bcryptService: BcryptService,
+    private jobQueueService: JobQueueService,
+    private redisUtilsService: RedisUtilsService
+  ) {}
+
+  signup = async (data: SignupRequestDTO): Promise<SignupResponseDTO> => {
+    const { fullName, email, password } = data;
+    const isEmailExists = !!(await this.prismaService.user.findFirst({
+      where: { email }
+    }));
+    if (isEmailExists) {
+      throw new BadRequestException('Email already exists');
+    }
+    const hashedPassword = await this.bcryptService.hash(password);
+    const createdUser = await this.prismaService.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        fullName
+      }
+    });
+    return { ...createdUser };
+  };
+
+  login = async (body: LoginBodyDTO): Promise<LoginResponseDTO> => {
+    const { email, password } = body;
+    const user = await this.prismaService.user
+      .findFirstOrThrow({
+        where: { email }
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Email is not associated with any account'
+        );
+      });
+
+    const isPasswordMatched = await this.bcryptService.isMatch(
+      password,
+      user.password
+    );
+    if (!isPasswordMatched) {
+      throw new BadRequestException('Wrong password');
+    }
+    const jwtPayload: TJWTPayload = { sub: user.id, email: user.email };
+    const { token: accessToken, expiresIn } =
+      await this.jwtUtilsService.signAccessToken(jwtPayload);
+    const refreshToken =
+      await this.jwtUtilsService.signRefreshToken(jwtPayload);
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+      expiresIn
+    };
+  };
+
+  sendResetPasswordMail = async (
+    email: string
+  ): Promise<SendResetPasswordMailResponseDto> => {
+    const user = await this.prismaService.user
+      .findUniqueOrThrow({ where: { email } })
+      .catch(() => {
+        throw new NotFoundException('Email is not associated with any account');
+      });
+
+    const resetPasswordTokenPayload: TJWTResetPasswordPayload = {
+      email
+    };
+    const resetPasswordToken =
+      await this.jwtUtilsService.signResetPasswordToken(
+        resetPasswordTokenPayload
+      );
+    const resetPasswordUrl = `${this.configService.get<string>('CLIENT_URL')}/reset-password?token=${resetPasswordToken}`;
+
+    const resetPasswordMailData: TResetPasswordMailData = {
+      to: email,
+      context: {
+        name: user.fullName,
+        reset_link: resetPasswordUrl
+      }
+    };
+    await this.redisUtilsService.setResetPasswordToken(
+      email,
+      resetPasswordToken
+    );
+    await this.jobQueueService.sendResetPasswordMail(resetPasswordMailData);
+    return {
+      message: 'A mail has been sent to the email successfully!'
+    };
+  };
+
+  resetPassword = async (
+    body: ResetPasswordBodyDto
+  ): Promise<ResetPasswordResponseDto> => {
+    const { token, newPassword } = body;
+    const decodeResetPasswordToken =
+      await this.jwtUtilsService.verifyResetPasswordToken(token);
+    if (!decodeResetPasswordToken) {
+      throw new BadRequestException('Reset password token is invalid');
+    }
+    const resetPasswordToken =
+      await this.redisUtilsService.getResetPasswordToken(
+        decodeResetPasswordToken.email
+      );
+    if (!resetPasswordToken) {
+      throw new BadRequestException('Reset password token is expired');
+    }
+    const hashedPassword = await this.bcryptService.hash(newPassword);
+    const updatedUser = await this.prismaService.user.update({
+      where: { email: decodeResetPasswordToken.email },
+      data: {
+        password: hashedPassword
+      }
+    });
+
+    await this.redisUtilsService.deleteResetPasswordToken(
+      decodeResetPasswordToken.email
+    );
+
+    return {
+      message: 'Reset password successfully',
+      user: updatedUser
+    };
+  };
+}
