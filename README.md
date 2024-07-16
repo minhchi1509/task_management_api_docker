@@ -6,7 +6,7 @@
 
 ## Công nghệ sử dụng
 
-- Server: ExpressJS
+- Server: NestJS
 - Database: MySQL
 - Caching: Redis
 
