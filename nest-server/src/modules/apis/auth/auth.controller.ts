@@ -14,6 +14,8 @@ import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
 import { AuthService } from 'src/modules/apis/auth/auth.service';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
+import { RefreshTokenBodyDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenBody.dto';
+import { RefreshTokenResponseDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenResponse.dto';
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
 import { SendResetPasswordMailBodyDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailBody.dto';
@@ -55,5 +57,13 @@ export class AuthController {
   ): Promise<ResetPasswordResponseDto> {
     const response = await this.authService.resetPassword(body);
     return plainToInstance(ResetPasswordResponseDto, response);
+  }
+
+  @Post('refresh-token')
+  async refreshToken(
+    @Body() body: RefreshTokenBodyDto
+  ): Promise<RefreshTokenResponseDto> {
+    const response = await this.authService.refreshToken(body);
+    return plainToInstance(RefreshTokenResponseDto, response);
   }
 }

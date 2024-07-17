@@ -24,4 +24,18 @@ export class RedisUtilsService {
     const token = await this.redisService.get(`reset_password_token:${email}`);
     return token;
   };
+
+  setUserRefreshToken = async (userId: string, refreshToken: string) => {
+    await this.redisService.set(
+      `refresh_token:${userId}`,
+      refreshToken,
+      'EX',
+      ETokenExpiration.REFRESH_TOKEN
+    );
+  };
+
+  getUserRefreshToken = async (userId: string) => {
+    const refreshToken = await this.redisService.get(`refresh_token:${userId}`);
+    return refreshToken;
+  };
 }

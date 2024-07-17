@@ -9,6 +9,8 @@ import { IEnvironmentVariables } from 'src/common/types/env.type';
 import { TResetPasswordMailData } from 'src/common/types/mail.type';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
+import { RefreshTokenBodyDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenBody.dto';
+import { RefreshTokenResponseDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenResponse.dto';
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
 import { SendResetPasswordMailResponseDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailResponse.dto';
@@ -78,6 +80,8 @@ export class AuthService {
       await this.jwtUtilsService.signAccessToken(jwtPayload);
     const refreshToken =
       await this.jwtUtilsService.signRefreshToken(jwtPayload);
+
+    await this.redisUtilsService.setUserRefreshToken(user.id, refreshToken);
 
     return {
       user,
@@ -153,6 +157,54 @@ export class AuthService {
     return {
       message: 'Reset password successfully',
       user: updatedUser
+    };
+  };
+
+  refreshToken = async (
+    body: RefreshTokenBodyDto
+  ): Promise<RefreshTokenResponseDto> => {
+    const { refreshToken } = body;
+
+    const decodeRefreshToken =
+      await this.jwtUtilsService.verifyRefreshToken(refreshToken);
+
+    if (!decodeRefreshToken) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+
+    const userRefreshToken = await this.redisUtilsService.getUserRefreshToken(
+      decodeRefreshToken.sub
+    );
+    if (!userRefreshToken || userRefreshToken !== refreshToken) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+
+    const payload: TJWTPayload = {
+      sub: decodeRefreshToken.sub,
+      email: decodeRefreshToken.email
+    };
+    const userId = decodeRefreshToken.sub;
+
+    const user = await this.prismaService.user
+      .findUniqueOrThrow({
+        where: { id: userId }
+      })
+      .catch(() => {
+        throw new NotFoundException('User not found');
+      });
+
+    const { token: newAccessToken, expiresIn } =
+      await this.jwtUtilsService.signAccessToken(payload);
+    const newRefreshToken =
+      await this.jwtUtilsService.signRefreshToken(payload);
+
+    await this.redisUtilsService.setUserRefreshToken(userId, newRefreshToken);
+
+    return {
+      user,
+      accessToken: newAccessToken,
+      expiresIn,
+      refreshToken: newRefreshToken
     };
   };
 }
