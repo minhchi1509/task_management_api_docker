@@ -11,7 +11,7 @@ import {
 import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
+import { CheckPermission } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
 import { RoomGuard } from 'src/common/guards/room.guard';
@@ -21,7 +21,7 @@ import { GetAllJoinedRoomResponseDTO } from 'src/modules/apis/room/dto/get-all-j
 import { GetRoomMembersResponseDTO } from 'src/modules/apis/room/dto/get-room-members/GetRoomMembersResponse.dto';
 import { JoinRoomResponseDTO } from 'src/modules/apis/room/dto/join-room/JoinRoomResponse.dto';
 import { RoomService } from 'src/modules/apis/room/room.service';
-import { GetRoomMemberPolicyHandler } from 'src/modules/policy-handler/room/handlers/GetRoomMemberPolicyHandler';
+import { GetRoomMemberPermissionHandler } from 'src/modules/permission-handler/room/handlers/GetRoomMemberPermissionHandler';
 
 @ApiTags('Room')
 @ApiBadRequestResponse({ type: ExceptionResponse })
@@ -59,7 +59,7 @@ export class RoomController {
   }
 
   @Get(':roomId/members')
-  @CheckPolicy(GetRoomMemberPolicyHandler)
+  @CheckPermission(GetRoomMemberPermissionHandler)
   async getRoomMembers(
     @Param('roomId') roomId: string
   ): Promise<GetRoomMembersResponseDTO> {

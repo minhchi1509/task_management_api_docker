@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
 import { ETaskActions } from 'src/common/constants/enum';
-import { IPolicyHandler } from 'src/common/types/policy.type';
+import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 
 @Injectable()
-export class ModifyTaskPolicyHandler implements IPolicyHandler<TRoomAbility> {
+export class ModifyTaskPermissionHandler
+  implements IPermissionHandler<TRoomAbility>
+{
   handle = async (userAbility: TRoomAbility) => {
     return (
       userAbility.can(ETaskActions.CREATE, 'Task') ||

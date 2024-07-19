@@ -1,5 +1,5 @@
 import { Request } from 'express';
 
-export interface IPolicyHandler<T> {
+export interface IPermissionHandler<T> {
   handle: (ability: T, request: Request) => boolean | Promise<boolean>;
 }

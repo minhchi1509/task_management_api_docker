@@ -11,15 +11,15 @@ import {
 import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
+import { CheckPermission } from 'src/common/decorators/metadata.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
 import { RoomGuard } from 'src/common/guards/room.guard';
 import { GetTaskTypesResponseDTO } from 'src/modules/apis/task-type/dto/get-task-types/GetTaskTypesResponse.dto';
 import { ModifyTaskTypeBodyDTO } from 'src/modules/apis/task-type/dto/modify-task-type/ModifyTaskTypeBody.dto';
 import { ModifyTaskTypeResponseDTO } from 'src/modules/apis/task-type/dto/modify-task-type/ModifyTaskTypeResponse.dto';
 import { TaskTypeService } from 'src/modules/apis/task-type/task-type.service';
-import { GetTaskTypePolicyHandler } from 'src/modules/policy-handler/task-type/handlers/GetTaskTypePolicyHandler';
-import { ModifyTaskTypeHandler } from 'src/modules/policy-handler/task-type/handlers/ModifyTaskTypeHandler';
+import { GetTaskTypePermissionHandler } from 'src/modules/permission-handler/task-type/handlers/GetTaskTypePermissionHandler';
+import { ModifyTaskTypePermissionHandler } from 'src/modules/permission-handler/task-type/handlers/ModifyTaskTypePermissionHandler';
 
 @ApiTags('Task Type')
 @ApiBearerAuth()
@@ -30,7 +30,7 @@ export class TaskTypeController {
   constructor(private taskTypeService: TaskTypeService) {}
 
   @Get()
-  @CheckPolicy(GetTaskTypePolicyHandler)
+  @CheckPermission(GetTaskTypePermissionHandler)
   async getTaskTypes(
     @Param('roomId') roomId: string
   ): Promise<GetTaskTypesResponseDTO> {
@@ -39,7 +39,7 @@ export class TaskTypeController {
   }
 
   @Post('create')
-  @CheckPolicy(ModifyTaskTypeHandler)
+  @CheckPermission(ModifyTaskTypePermissionHandler)
   async createTaskType(
     @Param('roomId') roomId: string,
     @Body() body: ModifyTaskTypeBodyDTO
@@ -49,7 +49,7 @@ export class TaskTypeController {
   }
 
   @Put(':taskTypeId')
-  @CheckPolicy(ModifyTaskTypeHandler)
+  @CheckPermission(ModifyTaskTypePermissionHandler)
   async editTaskType(
     @Param('taskTypeId') taskTypeId: string,
     @Param('roomId') roomId: string,
@@ -64,7 +64,7 @@ export class TaskTypeController {
   }
 
   @Delete(':taskTypeId')
-  @CheckPolicy(ModifyTaskTypeHandler)
+  @CheckPermission(ModifyTaskTypePermissionHandler)
   async deleteTaskType(
     @Param('taskTypeId') taskTypeId: string,
     @Param('roomId') roomId: string

@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
-import { CommentPolicyHandlerModule } from 'src/modules/policy-handler/comment/comment-policy-handler.module';
+import { CommentPermissionHandlerModule } from 'src/modules/permission-handler/comment/comment-permission-handler.module';
 
 @Module({
-  imports: [CommentPolicyHandlerModule],
+  imports: [CommentPermissionHandlerModule],
   controllers: [CommentController],
   providers: [CommentService]
 })

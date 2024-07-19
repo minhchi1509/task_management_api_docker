@@ -11,7 +11,7 @@ import {
 import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
+import { CheckPermission } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
 import { RoomGuard } from 'src/common/guards/room.guard';
@@ -22,10 +22,10 @@ import { DeleteCommentResponseDTO } from 'src/modules/apis/comment/dto/delete-co
 import { GetTaskCommentsResponseDTO } from 'src/modules/apis/comment/dto/get-task-comments/GetTaskCommentsResponse.dto';
 import { UpdateCommentBodyDTO } from 'src/modules/apis/comment/dto/update-comment/UpdateCommentBody.dto';
 import { UpdateCommentResponseDTO } from 'src/modules/apis/comment/dto/update-comment/UpdateCommentResponse.dto';
-import { CreateCommentPolicyHandler } from 'src/modules/policy-handler/comment/handlers/CreateCommentPolicyHandler';
-import { DeleteCommentPolicyHandler } from 'src/modules/policy-handler/comment/handlers/DeleteCommentPolicyHandler';
-import { GetTaskCommentsPolicyHandler } from 'src/modules/policy-handler/comment/handlers/GetTaskCommentsPolicyHandler';
-import { UpdateCommentPolicyHandler } from 'src/modules/policy-handler/comment/handlers/UpdateCommentPolicyHandler';
+import { CreateCommentPermissionHandler } from 'src/modules/permission-handler/comment/handlers/CreateCommentPermissionHandler';
+import { DeleteCommentPermissionHandler } from 'src/modules/permission-handler/comment/handlers/DeleteCommentPermissionHandler';
+import { GetTaskCommentsPermissionHandler } from 'src/modules/permission-handler/comment/handlers/GetTaskCommentsPermissionHandler';
+import { UpdateCommentPermissionHandler } from 'src/modules/permission-handler/comment/handlers/UpdateCommentPermissionHandler';
 
 @ApiTags('Comment')
 @ApiBearerAuth()
@@ -36,7 +36,7 @@ export class CommentController {
   constructor(private commentService: CommentService) {}
 
   @Get()
-  @CheckPolicy(GetTaskCommentsPolicyHandler)
+  @CheckPermission(GetTaskCommentsPermissionHandler)
   async getTaskComments(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string
@@ -49,7 +49,7 @@ export class CommentController {
   }
 
   @Post('create')
-  @CheckPolicy(CreateCommentPolicyHandler)
+  @CheckPermission(CreateCommentPermissionHandler)
   async createTaskComment(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string,
@@ -66,7 +66,7 @@ export class CommentController {
   }
 
   @Put(':commentId')
-  @CheckPolicy(UpdateCommentPolicyHandler)
+  @CheckPermission(UpdateCommentPermissionHandler)
   async updateTaskComment(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string,
@@ -83,7 +83,7 @@ export class CommentController {
   }
 
   @Delete(':commentId')
-  @CheckPolicy(DeleteCommentPolicyHandler)
+  @CheckPermission(DeleteCommentPermissionHandler)
   async deleteTaskComment(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string,

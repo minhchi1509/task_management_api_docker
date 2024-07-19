@@ -11,7 +11,7 @@ import {
 import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
+import { CheckPermission } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
 import { RoomGuard } from 'src/common/guards/room.guard';
@@ -24,9 +24,9 @@ import { GetReceivedAwardsResponseDTO } from 'src/modules/apis/award/dto/get-rec
 import { RetrieveAwardResponseDTO } from 'src/modules/apis/award/dto/retrieve-award/RetrieveAwardResponse.dto';
 import { UpdateAwardBodyDTO } from 'src/modules/apis/award/dto/update-award/UpdateAwardBody.dto';
 import { UpdateAwardResponseDTO } from 'src/modules/apis/award/dto/update-award/UpdateAwardResponse.dto';
-import { GetAwardPolicyHandler } from 'src/modules/policy-handler/award/handlers/GetAwardPolicyHandler';
-import { ModifyAwardPolicyHandler } from 'src/modules/policy-handler/award/handlers/ModifyAwardPolicyHandler';
-import { ReceiveAwardPolicyHandler } from 'src/modules/policy-handler/award/handlers/ReceiveAwardPolicyHandler';
+import { GetAwardPermissionHandler } from 'src/modules/permission-handler/award/handlers/GetAwardPermissionHandler';
+import { ModifyAwardPermissionHandler } from 'src/modules/permission-handler/award/handlers/ModifyAwardPermissionHandler';
+import { ReceiveAwardPermissionHandler } from 'src/modules/permission-handler/award/handlers/ReceiveAwardPermissionHandler';
 
 @ApiTags('Award')
 @ApiBearerAuth()
@@ -37,7 +37,7 @@ export class AwardController {
   constructor(private awardService: AwardService) {}
 
   @Post('create')
-  @CheckPolicy(ModifyAwardPolicyHandler)
+  @CheckPermission(ModifyAwardPermissionHandler)
   async createAward(
     @Param('roomId') roomId: string,
     @Body() body: CreateAwardBodyDTO
@@ -47,7 +47,7 @@ export class AwardController {
   }
 
   @Put(':awardId')
-  @CheckPolicy(ModifyAwardPolicyHandler)
+  @CheckPermission(ModifyAwardPermissionHandler)
   async updateAward(
     @Param('roomId') roomId: string,
     @Param('awardId') awardId: string,
@@ -62,7 +62,7 @@ export class AwardController {
   }
 
   @Delete(':awardId')
-  @CheckPolicy(ModifyAwardPolicyHandler)
+  @CheckPermission(ModifyAwardPermissionHandler)
   async deleteAward(
     @Param('roomId') roomId: string,
     @Param('awardId') awardId: string
@@ -72,7 +72,7 @@ export class AwardController {
   }
 
   @Get('available')
-  @CheckPolicy(GetAwardPolicyHandler)
+  @CheckPermission(GetAwardPermissionHandler)
   async getAvailableAwards(
     @Param('roomId') roomId: string,
     @UserId() userId: string
@@ -85,7 +85,7 @@ export class AwardController {
   }
 
   @Get('received')
-  @CheckPolicy(GetAwardPolicyHandler)
+  @CheckPermission(GetAwardPermissionHandler)
   async getReceivedAwards(
     @Param('roomId') roomId: string,
     @UserId() userId: string
@@ -98,7 +98,7 @@ export class AwardController {
   }
 
   @Post(':awardId/receive')
-  @CheckPolicy(ReceiveAwardPolicyHandler)
+  @CheckPermission(ReceiveAwardPermissionHandler)
   async receiveAward(
     @Param('roomId') roomId: string,
     @Param('awardId') awardId: string,

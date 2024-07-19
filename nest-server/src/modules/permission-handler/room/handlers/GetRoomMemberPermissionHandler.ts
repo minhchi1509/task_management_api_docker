@@ -3,13 +3,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Request } from 'express';
 
 import { ERoomActions } from 'src/common/constants/enum';
-import { IPolicyHandler } from 'src/common/types/policy.type';
+import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
 
 @Injectable()
-export class GetRoomMemberPolicyHandler
-  implements IPolicyHandler<TRoomAbility>
+export class GetRoomMemberPermissionHandler
+  implements IPermissionHandler<TRoomAbility>
 {
   constructor(private prismaService: PrismaService) {}
 

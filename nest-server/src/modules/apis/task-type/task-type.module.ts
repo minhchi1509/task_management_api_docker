@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { TaskTypeController } from './task-type.controller';
 import { TaskTypeService } from './task-type.service';
-import { TaskTypePolicyHandlerModule } from 'src/modules/policy-handler/task-type/task-type-policy-handler.module';
+import { TaskTypePermissionHandlerModule } from 'src/modules/permission-handler/task-type/task-type-permission-handler.module';
 
 @Module({
-  imports: [TaskTypePolicyHandlerModule],
+  imports: [TaskTypePermissionHandlerModule],
   controllers: [TaskTypeController],
   providers: [TaskTypeService],
   exports: [TaskTypeService]

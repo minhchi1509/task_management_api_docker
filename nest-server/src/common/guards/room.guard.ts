@@ -20,7 +20,7 @@ import {
   ETaskCommentActions,
   ETaskTypeActions
 } from 'src/common/constants/enum';
-import { IPolicyHandler } from 'src/common/types/policy.type';
+import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 import { TJWTPayload } from 'src/modules/libs/jwt-utils/types/jwt.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
@@ -36,7 +36,7 @@ export class RoomGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const policy = this.reflector.getAllAndOverride<
-      Type<IPolicyHandler<TRoomAbility>> | undefined
+      Type<IPermissionHandler<TRoomAbility>> | undefined
     >(EMetadataKey.CHECK_POLICY, [context.getClass(), context.getHandler()]);
 
     if (!policy) {

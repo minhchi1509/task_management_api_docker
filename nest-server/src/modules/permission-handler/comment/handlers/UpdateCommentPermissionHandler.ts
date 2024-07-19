@@ -3,28 +3,32 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Request } from 'express';
 
 import { ETaskCommentActions } from 'src/common/constants/enum';
-import { IPolicyHandler } from 'src/common/types/policy.type';
+import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
 
 @Injectable()
-export class CreateCommentPolicyHandler
-  implements IPolicyHandler<TRoomAbility>
+export class UpdateCommentPermissionHandler
+  implements IPermissionHandler<TRoomAbility>
 {
   constructor(private prismaService: PrismaService) {}
 
   handle = async (userAbility: TRoomAbility, request: Request) => {
     const roomId = request.params.roomId;
     const taskId = request.params.taskId;
-    const task = await this.prismaService.task
+    const commentId = request.params.commentId;
+    const comment = await this.prismaService.comment
       .findFirstOrThrow({
-        where: { id: taskId, roomId },
-        include: { performers: true }
+        where: { id: commentId, task: { id: taskId, roomId } },
+        include: { commentator: true }
       })
       .catch(() => {
-        throw new NotFoundException('Task not found');
+        throw new NotFoundException('Comment not found');
       });
 
-    return userAbility.can(ETaskCommentActions.CREATE, subject('Task', task));
+    return userAbility.can(
+      ETaskCommentActions.UPDATE,
+      subject('Comment', comment)
+    );
   };
 }

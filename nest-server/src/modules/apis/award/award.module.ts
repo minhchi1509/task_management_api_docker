@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { AwardController } from './award.controller';
 import { AwardService } from './award.service';
-import { AwardPolicyHandlerModule } from 'src/modules/policy-handler/award/award-policy-handler.module';
+import { AwardPermissionHandlerModule } from 'src/modules/permission-handler/award/award-permission-handler.module';
 
 @Module({
-  imports: [AwardPolicyHandlerModule],
+  imports: [AwardPermissionHandlerModule],
   controllers: [AwardController],
   providers: [AwardService]
 })

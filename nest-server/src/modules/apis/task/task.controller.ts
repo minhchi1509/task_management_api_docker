@@ -12,7 +12,7 @@ import {
 import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
+import { CheckPermission } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
 import { RoomGuard } from 'src/common/guards/room.guard';
@@ -29,9 +29,9 @@ import { UpdateSubtaskStatusResponseDTO } from 'src/modules/apis/task/dto/update
 import { UpdateTaskBodyDTO } from 'src/modules/apis/task/dto/update-task/UpdateTaskBody.dto';
 import { UpdateTaskResponseDTO } from 'src/modules/apis/task/dto/update-task/UpdateTaskResponse.dto';
 import { TaskService } from 'src/modules/apis/task/task.service';
-import { GetTaskPolicyHandler } from 'src/modules/policy-handler/task/handlers/GetTaskPolicyHandler';
-import { ModifyTaskPolicyHandler } from 'src/modules/policy-handler/task/handlers/ModifyTaskPolicyHandler';
-import { UpdateSubTaskPolicyHandler } from 'src/modules/policy-handler/task/handlers/UpdateSubTaskPolicyHandler';
+import { GetTaskPermissionHandler } from 'src/modules/permission-handler/task/handlers/GetTaskPermissionHandler';
+import { ModifyTaskPermissionHandler } from 'src/modules/permission-handler/task/handlers/ModifyTaskPermissionHandler';
+import { UpdateSubTaskPermissionHandler } from 'src/modules/permission-handler/task/handlers/UpdateSubTaskPermissionHandler';
 
 @ApiTags('Task')
 @ApiBearerAuth()
@@ -42,7 +42,7 @@ export class TaskController {
   constructor(private taskService: TaskService) {}
 
   @Post('create')
-  @CheckPolicy(ModifyTaskPolicyHandler)
+  @CheckPermission(ModifyTaskPermissionHandler)
   async createTask(
     @Body() body: CreateTaskBodyDTO,
     @Param('roomId') roomId: string
@@ -52,7 +52,7 @@ export class TaskController {
   }
 
   @Get()
-  @CheckPolicy(GetTaskPolicyHandler)
+  @CheckPermission(GetTaskPermissionHandler)
   async getTasksInRoom(
     @Param('roomId') roomId: string,
     @Query() query: GetTasksInRoomQueryDTO
@@ -62,7 +62,7 @@ export class TaskController {
   }
 
   @Get('assigned')
-  @CheckPolicy(GetTaskPolicyHandler)
+  @CheckPermission(GetTaskPermissionHandler)
   async getAssignedTasksInRoom(
     @Param('roomId') roomId: string,
     @Query() query: GetAssignedTasksQueryDTO,
@@ -77,7 +77,7 @@ export class TaskController {
   }
 
   @Get(':taskId')
-  @CheckPolicy(GetTaskPolicyHandler)
+  @CheckPermission(GetTaskPermissionHandler)
   async getTaskById(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string
@@ -87,7 +87,7 @@ export class TaskController {
   }
 
   @Put(':taskId')
-  @CheckPolicy(ModifyTaskPolicyHandler)
+  @CheckPermission(ModifyTaskPermissionHandler)
   async updateTask(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string,
@@ -102,7 +102,7 @@ export class TaskController {
   }
 
   @Delete(':taskId')
-  @CheckPolicy(ModifyTaskPolicyHandler)
+  @CheckPermission(ModifyTaskPermissionHandler)
   async deleteTask(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string
@@ -112,7 +112,7 @@ export class TaskController {
   }
 
   @Put(':taskId/sub-tasks/:subTaskId/status')
-  @CheckPolicy(UpdateSubTaskPolicyHandler)
+  @CheckPermission(UpdateSubTaskPermissionHandler)
   async updateSubTaskStatus(
     @Param('roomId') roomId: string,
     @Param('taskId') taskId: string,
