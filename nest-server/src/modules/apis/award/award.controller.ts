@@ -14,7 +14,7 @@ import { plainToInstance } from 'class-transformer';
 import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
-import { RoomPolicyGuard } from 'src/common/guards/room-policy.guard';
+import { RoomGuard } from 'src/common/guards/room.guard';
 import { AwardService } from 'src/modules/apis/award/award.service';
 import { CreateAwardBodyDTO } from 'src/modules/apis/award/dto/create-award/CreateAwardBody.dto';
 import { CreateAwardResponseDTO } from 'src/modules/apis/award/dto/create-award/CreateAwardResponse.dto';
@@ -32,7 +32,7 @@ import { ReceiveAwardPolicyHandler } from 'src/modules/policy-handler/award/hand
 @ApiBearerAuth()
 @ApiBadRequestResponse({ type: ExceptionResponse })
 @Controller('rooms/:roomId/awards')
-@UseGuards(RoomPolicyGuard)
+@UseGuards(RoomGuard)
 export class AwardController {
   constructor(private awardService: AwardService) {}
 

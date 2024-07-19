@@ -14,7 +14,7 @@ import { plainToInstance } from 'class-transformer';
 import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
-import { RoomPolicyGuard } from 'src/common/guards/room-policy.guard';
+import { RoomGuard } from 'src/common/guards/room.guard';
 import { CommentService } from 'src/modules/apis/comment/comment.service';
 import { CreateCommentBodyDTO } from 'src/modules/apis/comment/dto/create-comment/CreateCommentBody.dto';
 import { CreateCommentResponseDTO } from 'src/modules/apis/comment/dto/create-comment/CreateCommentResponse.dto';
@@ -31,7 +31,7 @@ import { UpdateCommentPolicyHandler } from 'src/modules/policy-handler/comment/h
 @ApiBearerAuth()
 @ApiBadRequestResponse({ type: ExceptionResponse })
 @Controller('rooms/:roomId/tasks/:taskId/comments')
-@UseGuards(RoomPolicyGuard)
+@UseGuards(RoomGuard)
 export class CommentController {
   constructor(private commentService: CommentService) {}
 

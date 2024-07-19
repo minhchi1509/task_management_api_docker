@@ -15,7 +15,7 @@ import { plainToInstance } from 'class-transformer';
 import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
-import { RoomPolicyGuard } from 'src/common/guards/room-policy.guard';
+import { RoomGuard } from 'src/common/guards/room.guard';
 import { CreateTaskResponseDTO } from 'src/modules/apis/task/dto/create-task/CreateTaskResponse.dto';
 import { CreateTaskBodyDTO } from 'src/modules/apis/task/dto/create-task/CreatTaskBody.dto';
 import { DeleteTaskResponseDTO } from 'src/modules/apis/task/dto/delete-task/DeleteTaskResponse.dto';
@@ -37,7 +37,7 @@ import { UpdateSubTaskPolicyHandler } from 'src/modules/policy-handler/task/hand
 @ApiBearerAuth()
 @ApiBadRequestResponse({ type: ExceptionResponse })
 @Controller('rooms/:roomId/tasks')
-@UseGuards(RoomPolicyGuard)
+@UseGuards(RoomGuard)
 export class TaskController {
   constructor(private taskService: TaskService) {}
 

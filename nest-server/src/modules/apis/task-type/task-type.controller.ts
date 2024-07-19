@@ -13,7 +13,7 @@ import { plainToInstance } from 'class-transformer';
 
 import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
-import { RoomPolicyGuard } from 'src/common/guards/room-policy.guard';
+import { RoomGuard } from 'src/common/guards/room.guard';
 import { GetTaskTypesResponseDTO } from 'src/modules/apis/task-type/dto/get-task-types/GetTaskTypesResponse.dto';
 import { ModifyTaskTypeBodyDTO } from 'src/modules/apis/task-type/dto/modify-task-type/ModifyTaskTypeBody.dto';
 import { ModifyTaskTypeResponseDTO } from 'src/modules/apis/task-type/dto/modify-task-type/ModifyTaskTypeResponse.dto';
@@ -25,7 +25,7 @@ import { ModifyTaskTypeHandler } from 'src/modules/policy-handler/task-type/hand
 @ApiBearerAuth()
 @ApiBadRequestResponse({ type: ExceptionResponse })
 @Controller('rooms/:roomId/task-type')
-@UseGuards(RoomPolicyGuard)
+@UseGuards(RoomGuard)
 export class TaskTypeController {
   constructor(private taskTypeService: TaskTypeService) {}
 

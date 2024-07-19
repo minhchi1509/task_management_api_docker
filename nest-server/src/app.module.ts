@@ -71,7 +71,7 @@ import { JwtUtilsModule } from 'src/modules/libs/jwt-utils/jwt-utils.module';
           from: `"Task Management System" <no-reply@google.com>`
         },
         template: {
-          dir: join(__dirname, 'common/mail/templates'),
+          dir: join(__dirname, 'common/assets/mail-templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true

@@ -14,7 +14,7 @@ import { plainToInstance } from 'class-transformer';
 import { CheckPolicy } from 'src/common/decorators/metadata.decorator';
 import { UserId } from 'src/common/decorators/user.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
-import { RoomPolicyGuard } from 'src/common/guards/room-policy.guard';
+import { RoomGuard } from 'src/common/guards/room.guard';
 import { CreateRoomBodyDTO } from 'src/modules/apis/room/dto/create-room/CreateRoomBody.dto';
 import { CreateRoomResponseDTO } from 'src/modules/apis/room/dto/create-room/CreateRoomResponse.dto';
 import { GetAllJoinedRoomResponseDTO } from 'src/modules/apis/room/dto/get-all-joined-room/GetAllJoinedRoomResponse.dto';
@@ -27,7 +27,7 @@ import { GetRoomMemberPolicyHandler } from 'src/modules/policy-handler/room/hand
 @ApiBadRequestResponse({ type: ExceptionResponse })
 @ApiBearerAuth()
 @Controller('room')
-@UseGuards(RoomPolicyGuard)
+@UseGuards(RoomGuard)
 export class RoomController {
   constructor(private roomService: RoomService) {}
 
