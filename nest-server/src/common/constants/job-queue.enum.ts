@@ -1,7 +1,7 @@
 export enum EQueueName {
-  SENDING_EMAIL = 'SENDING_EMAIL'
+  MAIL_QUEUE = 'MAIL_QUEUE'
 }
 
-export enum EJobName {
+export enum EMailJobName {
   RESET_PASSWORD = 'RESET_PASSWORD'
 }

@@ -1,6 +1,6 @@
 import { SetMetadata, Type } from '@nestjs/common';
 
-import { EMetadataKey } from 'src/common/constants/enum';
+import { EMetadataKey } from 'src/common/constants/common.enum';
 import { IPermissionHandler } from 'src/common/types/permission.type';
 
 export const PublicRoute = () =>
@@ -10,4 +10,4 @@ export const ProtectedRoute = () =>
   SetMetadata(EMetadataKey.IS_PUBLIC_ROUTE, false);
 
 export const CheckPermission = <T>(handler: Type<IPermissionHandler<T>>) =>
-  SetMetadata(EMetadataKey.CHECK_POLICY, handler);
+  SetMetadata(EMetadataKey.CHECK_PERMISSION, handler);

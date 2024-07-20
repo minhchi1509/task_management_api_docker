@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Redis, RedisOptions } from 'ioredis';
 
-import { EProviderKey } from 'src/common/constants/enum';
+import { EProviderKey } from 'src/common/constants/common.enum';
 
 @Injectable()
 export class RedisService extends Redis implements OnModuleInit {

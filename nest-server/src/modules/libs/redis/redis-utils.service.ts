@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ETokenExpiration } from 'src/common/constants/enum';
+import { ETokenExpiration } from 'src/common/constants/common.enum';
 import { RedisService } from 'src/modules/libs/redis/redis.service';
 
 @Injectable()

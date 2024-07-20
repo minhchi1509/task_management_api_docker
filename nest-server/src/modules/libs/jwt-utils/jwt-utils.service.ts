@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { ETokenExpiration } from 'src/common/constants/enum';
+import { ETokenExpiration } from 'src/common/constants/common.enum';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 import {
   TJWTPayload,

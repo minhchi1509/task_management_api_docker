@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-import { ERequestPayloadKey } from 'src/common/constants/enum';
+import { ERequestPayloadKey } from 'src/common/constants/common.enum';
 import { TJWTPayload } from 'src/modules/libs/jwt-utils/types/jwt.type';
 
 export const UserId = createParamDecorator(

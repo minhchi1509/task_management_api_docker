@@ -17,7 +17,7 @@ import { SendResetPasswordMailResponseDto } from 'src/modules/apis/auth/dto/send
 import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dto';
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
 import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
-import { JobQueueService } from 'src/modules/libs/job-queue/job-queue.service';
+import { MailQueueService } from 'src/modules/libs/job-queue/mail-queue/mail-queue.service';
 import { JwtUtilsService } from 'src/modules/libs/jwt-utils/jwt-utils.service';
 import {
   TJWTPayload,
@@ -33,7 +33,7 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtUtilsService: JwtUtilsService,
     private bcryptService: BcryptService,
-    private jobQueueService: JobQueueService,
+    private mailQueueService: MailQueueService,
     private redisUtilsService: RedisUtilsService
   ) {}
 
@@ -120,7 +120,7 @@ export class AuthService {
       email,
       resetPasswordToken
     );
-    await this.jobQueueService.sendResetPasswordMail(resetPasswordMailData);
+    await this.mailQueueService.sendResetPasswordMail(resetPasswordMailData);
     return {
       message: 'A mail has been sent to the email successfully!'
     };

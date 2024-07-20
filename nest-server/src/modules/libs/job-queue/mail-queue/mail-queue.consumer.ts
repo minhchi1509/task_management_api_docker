@@ -2,18 +2,15 @@ import { Process, Processor } from '@nestjs/bull';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Job } from 'bull';
 
+import { EMailJobName, EQueueName } from 'src/common/constants/job-queue.enum';
 import { TResetPasswordMailData } from 'src/common/types/mail.type';
-import {
-  EJobName,
-  EQueueName
-} from 'src/modules/libs/job-queue/enum/job-queue.enum';
 
-@Processor(EQueueName.SENDING_EMAIL)
-export class EmailConsumer {
+@Processor(EQueueName.MAIL_QUEUE)
+export class MailConsumer {
   constructor(private mailService: MailerService) {}
 
-  @Process(EJobName.RESET_PASSWORD)
-  async sendResetPasswordEmail(job: Job<TResetPasswordMailData>) {
+  @Process(EMailJobName.RESET_PASSWORD)
+  async sendResetPasswordMail(job: Job<TResetPasswordMailData>) {
     const { data } = job;
     await this.mailService.sendMail({
       to: data.to,

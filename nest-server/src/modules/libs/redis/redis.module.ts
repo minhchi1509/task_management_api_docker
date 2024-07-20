@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
-import { EProviderKey } from 'src/common/constants/enum';
+import { EProviderKey } from 'src/common/constants/common.enum';
 import { RedisService } from 'src/modules/libs/redis/redis.service';
 import { RedisUtilsService } from 'src/modules/libs/redis/redis-utils.service';
 import {

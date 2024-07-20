@@ -13,13 +13,15 @@ import { RoomMember, RoomRole } from '@prisma/client';
 
 import {
   EAwardActions,
-  EMetadataKey,
-  ERequestPayloadKey,
   ESubTaskActions,
   ETaskActions,
   ETaskCommentActions,
   ETaskTypeActions
-} from 'src/common/constants/enum';
+} from 'src/common/constants/actions.enum';
+import {
+  EMetadataKey,
+  ERequestPayloadKey
+} from 'src/common/constants/common.enum';
 import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 import { TJWTPayload } from 'src/modules/libs/jwt-utils/types/jwt.type';
@@ -37,7 +39,10 @@ export class RoomGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const policy = this.reflector.getAllAndOverride<
       Type<IPermissionHandler<TRoomAbility>> | undefined
-    >(EMetadataKey.CHECK_POLICY, [context.getClass(), context.getHandler()]);
+    >(EMetadataKey.CHECK_PERMISSION, [
+      context.getClass(),
+      context.getHandler()
+    ]);
 
     if (!policy) {
       return true;

@@ -7,7 +7,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
-import { EMetadataKey, ERequestPayloadKey } from 'src/common/constants/enum';
+import {
+  EMetadataKey,
+  ERequestPayloadKey
+} from 'src/common/constants/common.enum';
 import { JwtUtilsService } from 'src/modules/libs/jwt-utils/jwt-utils.service';
 
 @Injectable()

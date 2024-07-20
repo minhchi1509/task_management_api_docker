@@ -2,7 +2,7 @@ import { subject } from '@casl/ability';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Request } from 'express';
 
-import { ETaskCommentActions } from 'src/common/constants/enum';
+import { ETaskCommentActions } from 'src/common/constants/actions.enum';
 import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
