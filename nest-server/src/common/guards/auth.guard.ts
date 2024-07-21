@@ -11,12 +11,12 @@ import {
   EMetadataKey,
   ERequestPayloadKey
 } from 'src/common/constants/common.enum';
-import { JwtUtilsService } from 'src/modules/libs/jwt-utils/jwt-utils.service';
+import { TokenService } from 'src/modules/libs/token/token.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtUtilsService: JwtUtilsService,
+    private tokenService: TokenService,
     private reflector: Reflector
   ) {}
 
@@ -35,8 +35,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token is required');
     }
 
-    const accessTokenPayload =
-      await this.jwtUtilsService.verifyAccessToken(token);
+    const accessTokenPayload = await this.tokenService.verifyAccessToken(token);
     if (!accessTokenPayload) {
       throw new UnauthorizedException('Invalid token');
     }

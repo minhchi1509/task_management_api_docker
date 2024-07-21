@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import ShortUniqueId, { ShortUniqueIdOptions } from 'short-unique-id';
 
-import { EProviderKey } from 'src/common/constants/common.enum';
+import { EProviderKey } from 'src/common/constants/provider-key.constant';
 
 @Injectable()
 export class ShortUniqueIdService extends ShortUniqueId {

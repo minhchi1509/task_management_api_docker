@@ -8,10 +8,10 @@ import {
   TJWTPayload,
   TJWTResetPasswordPayload,
   TSignTokenResponse
-} from 'src/modules/libs/jwt-utils/types/jwt.type';
+} from 'src/common/types/token.type';
 
 @Injectable()
-export class JwtUtilsService {
+export class TokenService {
   constructor(
     private configService: ConfigService<IEnvironmentVariables>,
     private jwtService: JwtService

@@ -21,12 +21,12 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AppClassSerializerInterceptor } from 'src/common/interceptors/app-class-serializer.interceptor';
 import { AppValidationPipe } from 'src/common/pipes/app-validation.pipe';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
-import { JwtUtilsModule } from 'src/modules/libs/jwt-utils/jwt-utils.module';
+import { TokenModule } from 'src/modules/libs/token/token.module';
 
 @Module({
   imports: [
     NestjsFormDataModule.config({ isGlobal: true }),
-    JwtUtilsModule,
+    TokenModule,
     RedisModule.forRootAsync({
       isGlobal: true,
       imports: [ConfigModule],

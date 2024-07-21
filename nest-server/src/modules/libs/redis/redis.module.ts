@@ -1,12 +1,12 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
-import { EProviderKey } from 'src/common/constants/common.enum';
-import { RedisService } from 'src/modules/libs/redis/redis.service';
-import { RedisUtilsService } from 'src/modules/libs/redis/redis-utils.service';
+import { EProviderKey } from 'src/common/constants/provider-key.constant';
 import {
   IRedisModuleAsyncOptions,
   IRedisModuleOptions
-} from 'src/modules/libs/redis/types/redis-module.type';
+} from 'src/common/types/redis-module.type';
+import { RedisProvider } from 'src/modules/libs/redis/redis.provider';
+import { RedisService } from 'src/modules/libs/redis/redis.service';
 
 @Module({})
 export class RedisModule {
@@ -16,15 +16,15 @@ export class RedisModule {
       module: RedisModule,
       imports: options.imports || [],
       providers: [
+        RedisProvider,
         RedisService,
-        RedisUtilsService,
         {
           provide: EProviderKey.REDIS_OPTIONS,
           useFactory: options.useFactory || defaultFactory,
           inject: options.inject || []
         }
       ],
-      exports: [RedisUtilsService],
+      exports: [RedisService],
       global: options.isGlobal ?? false
     };
   }
@@ -33,11 +33,11 @@ export class RedisModule {
     return {
       module: RedisModule,
       providers: [
+        RedisProvider,
         RedisService,
-        RedisUtilsService,
         { provide: EProviderKey.REDIS_OPTIONS, useValue: options }
       ],
-      exports: [RedisUtilsService],
+      exports: [RedisService],
       global: options.isGlobal ?? false
     };
   }

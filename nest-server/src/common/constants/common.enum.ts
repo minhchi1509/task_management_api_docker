@@ -9,11 +9,6 @@ export enum ETokenExpiration {
   RESET_PASSWORD_TOKEN = 5 * 60
 }
 
-export enum EProviderKey {
-  REDIS_OPTIONS = 'REDIS_OPTIONS',
-  SHORT_ID_OPTIONS = 'SHORT_ID_OPTIONS'
-}
-
 export enum ERequestPayloadKey {
   USER = 'user'
 }

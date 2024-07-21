@@ -24,7 +24,7 @@ import {
 } from 'src/common/constants/common.enum';
 import { IPermissionHandler } from 'src/common/types/permission.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
-import { TJWTPayload } from 'src/modules/libs/jwt-utils/types/jwt.type';
+import { TJWTPayload } from 'src/common/types/token.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
 
 @Injectable()

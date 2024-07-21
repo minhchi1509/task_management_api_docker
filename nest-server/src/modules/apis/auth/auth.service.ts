@@ -7,6 +7,10 @@ import { ConfigService } from '@nestjs/config';
 
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 import { TResetPasswordMailData } from 'src/common/types/mail.type';
+import {
+  TJWTPayload,
+  TJWTResetPasswordPayload
+} from 'src/common/types/token.type';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
 import { RefreshTokenBodyDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenBody.dto';
@@ -18,23 +22,19 @@ import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dt
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
 import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
 import { MailQueueService } from 'src/modules/libs/job-queue/mail-queue/mail-queue.service';
-import { JwtUtilsService } from 'src/modules/libs/jwt-utils/jwt-utils.service';
-import {
-  TJWTPayload,
-  TJWTResetPasswordPayload
-} from 'src/modules/libs/jwt-utils/types/jwt.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
-import { RedisUtilsService } from 'src/modules/libs/redis/redis-utils.service';
+import { RedisService } from 'src/modules/libs/redis/redis.service';
+import { TokenService } from 'src/modules/libs/token/token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private configService: ConfigService<IEnvironmentVariables>,
     private prismaService: PrismaService,
-    private jwtUtilsService: JwtUtilsService,
+    private tokenService: TokenService,
     private bcryptService: BcryptService,
     private mailQueueService: MailQueueService,
-    private redisUtilsService: RedisUtilsService
+    private redisService: RedisService
   ) {}
 
   signup = async (data: SignupRequestDTO): Promise<SignupResponseDTO> => {
@@ -77,11 +77,10 @@ export class AuthService {
     }
     const jwtPayload: TJWTPayload = { sub: user.id, email: user.email };
     const { token: accessToken, expiresIn } =
-      await this.jwtUtilsService.signAccessToken(jwtPayload);
-    const refreshToken =
-      await this.jwtUtilsService.signRefreshToken(jwtPayload);
+      await this.tokenService.signAccessToken(jwtPayload);
+    const refreshToken = await this.tokenService.signRefreshToken(jwtPayload);
 
-    await this.redisUtilsService.setUserRefreshToken(user.id, refreshToken);
+    await this.redisService.setUserRefreshToken(user.id, refreshToken);
 
     return {
       user,
@@ -103,10 +102,9 @@ export class AuthService {
     const resetPasswordTokenPayload: TJWTResetPasswordPayload = {
       email
     };
-    const resetPasswordToken =
-      await this.jwtUtilsService.signResetPasswordToken(
-        resetPasswordTokenPayload
-      );
+    const resetPasswordToken = await this.tokenService.signResetPasswordToken(
+      resetPasswordTokenPayload
+    );
     const resetPasswordUrl = `${this.configService.get<string>('CLIENT_URL')}/reset-password?token=${resetPasswordToken}`;
 
     const resetPasswordMailData: TResetPasswordMailData = {
@@ -116,10 +114,7 @@ export class AuthService {
         reset_link: resetPasswordUrl
       }
     };
-    await this.redisUtilsService.setResetPasswordToken(
-      email,
-      resetPasswordToken
-    );
+    await this.redisService.setResetPasswordToken(email, resetPasswordToken);
     await this.mailQueueService.sendResetPasswordMail(resetPasswordMailData);
     return {
       message: 'A mail has been sent to the email successfully!'
@@ -131,14 +126,13 @@ export class AuthService {
   ): Promise<ResetPasswordResponseDto> => {
     const { token, newPassword } = body;
     const decodeResetPasswordToken =
-      await this.jwtUtilsService.verifyResetPasswordToken(token);
+      await this.tokenService.verifyResetPasswordToken(token);
     if (!decodeResetPasswordToken) {
       throw new BadRequestException('Reset password token is invalid');
     }
-    const resetPasswordToken =
-      await this.redisUtilsService.getResetPasswordToken(
-        decodeResetPasswordToken.email
-      );
+    const resetPasswordToken = await this.redisService.getResetPasswordToken(
+      decodeResetPasswordToken.email
+    );
     if (!resetPasswordToken) {
       throw new BadRequestException('Reset password token is expired');
     }
@@ -150,7 +144,7 @@ export class AuthService {
       }
     });
 
-    await this.redisUtilsService.deleteResetPasswordToken(
+    await this.redisService.deleteResetPasswordToken(
       decodeResetPasswordToken.email
     );
 
@@ -166,13 +160,13 @@ export class AuthService {
     const { refreshToken } = body;
 
     const decodeRefreshToken =
-      await this.jwtUtilsService.verifyRefreshToken(refreshToken);
+      await this.tokenService.verifyRefreshToken(refreshToken);
 
     if (!decodeRefreshToken) {
       throw new BadRequestException('Invalid refresh token');
     }
 
-    const userRefreshToken = await this.redisUtilsService.getUserRefreshToken(
+    const userRefreshToken = await this.redisService.getUserRefreshToken(
       decodeRefreshToken.sub
     );
     if (!userRefreshToken || userRefreshToken !== refreshToken) {
@@ -194,11 +188,10 @@ export class AuthService {
       });
 
     const { token: newAccessToken, expiresIn } =
-      await this.jwtUtilsService.signAccessToken(payload);
-    const newRefreshToken =
-      await this.jwtUtilsService.signRefreshToken(payload);
+      await this.tokenService.signAccessToken(payload);
+    const newRefreshToken = await this.tokenService.signRefreshToken(payload);
 
-    await this.redisUtilsService.setUserRefreshToken(userId, newRefreshToken);
+    await this.redisService.setUserRefreshToken(userId, newRefreshToken);
 
     return {
       user,

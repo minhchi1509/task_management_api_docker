@@ -1,29 +1,41 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Redis, RedisOptions } from 'ioredis';
+import { Injectable } from '@nestjs/common';
 
-import { EProviderKey } from 'src/common/constants/common.enum';
+import { ETokenExpiration } from 'src/common/constants/common.enum';
+import { RedisProvider } from 'src/modules/libs/redis/redis.provider';
 
 @Injectable()
-export class RedisService extends Redis implements OnModuleInit {
-  private readonly logger = new Logger(RedisService.name);
+export class RedisService {
+  constructor(private redis: RedisProvider) {}
 
-  constructor(
-    @Inject(EProviderKey.REDIS_OPTIONS)
-    options: RedisOptions
-  ) {
-    super(options);
-  }
+  setResetPasswordToken = async (email: string, token: string) => {
+    await this.redis.set(
+      `reset_password_token:${email}`,
+      token,
+      'EX',
+      ETokenExpiration.RESET_PASSWORD_TOKEN
+    );
+  };
 
-  async onModuleInit() {
-    try {
-      const redisInfo = await this.info();
-      await this.config('SET', 'notify-keyspace-events', 'KEA');
-      this.logger.log('🚀 Connect to Redis successfully!');
-    } catch (error) {
-      this.disconnect();
-      throw new Error(
-        `❌ Connect to Redis failed: ${(error as Error).message}`
-      );
-    }
-  }
+  deleteResetPasswordToken = async (email: string) => {
+    await this.redis.del(`reset_password_token:${email}`);
+  };
+
+  getResetPasswordToken = async (email: string) => {
+    const token = await this.redis.get(`reset_password_token:${email}`);
+    return token;
+  };
+
+  setUserRefreshToken = async (userId: string, refreshToken: string) => {
+    await this.redis.set(
+      `refresh_token:${userId}`,
+      refreshToken,
+      'EX',
+      ETokenExpiration.REFRESH_TOKEN
+    );
+  };
+
+  getUserRefreshToken = async (userId: string) => {
+    const refreshToken = await this.redis.get(`refresh_token:${userId}`);
+    return refreshToken;
+  };
 }

@@ -1,0 +1,4 @@
+export enum EProviderKey {
+  REDIS_OPTIONS = 'REDIS_OPTIONS',
+  SHORT_ID_OPTIONS = 'SHORT_ID_OPTIONS'
+}

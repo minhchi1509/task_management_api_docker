@@ -1,11 +1,11 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
-import { EProviderKey } from 'src/common/constants/common.enum';
-import { ShortUniqueIdService } from 'src/modules/libs/short-id/short-id.service';
+import { EProviderKey } from 'src/common/constants/provider-key.constant';
 import {
   IShortIdModuleAsyncOptions,
   IShortIdModuleOptions
-} from 'src/modules/libs/short-id/types/short-id-module.type';
+} from 'src/common/types/short-id-module.type';
+import { ShortUniqueIdService } from 'src/modules/libs/short-id/short-id.service';
 
 @Module({})
 export class ShortUniqueIdModule {
