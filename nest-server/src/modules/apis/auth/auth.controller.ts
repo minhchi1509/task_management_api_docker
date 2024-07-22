@@ -11,6 +11,7 @@ import { plainToInstance } from 'class-transformer';
 
 import { PublicRoute } from 'src/common/decorators/metadata.decorator';
 import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
 import { AuthService } from 'src/modules/apis/auth/auth.service';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
@@ -19,7 +20,6 @@ import { RefreshTokenResponseDto } from 'src/modules/apis/auth/dto/refresh-token
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
 import { SendResetPasswordMailBodyDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailBody.dto';
-import { SendResetPasswordMailResponseDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailResponse.dto';
 import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dto';
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
 
@@ -46,9 +46,9 @@ export class AuthController {
   @Post('send-reset-password-mail')
   async sendResetPasswordMail(
     @Body() body: SendResetPasswordMailBodyDto
-  ): Promise<SendResetPasswordMailResponseDto> {
+  ): Promise<MessageResponseDTO> {
     const response = await this.authService.sendResetPasswordMail(body.email);
-    return plainToInstance(SendResetPasswordMailResponseDto, response);
+    return plainToInstance(MessageResponseDTO, response);
   }
 
   @Put('reset-password')

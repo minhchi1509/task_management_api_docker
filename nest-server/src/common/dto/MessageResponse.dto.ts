@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class SendResetPasswordMailResponseDto {
+export class MessageResponseDTO {
   @Expose()
   message: string;
 }

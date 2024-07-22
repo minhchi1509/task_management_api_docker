@@ -108,7 +108,8 @@ export class RoomService {
         profile: {
           id: member.user.id,
           fullName: member.user.fullName,
-          email: member.user.email
+          email: member.user.email,
+          avatar: member.user.avatar
         },
         joinedAt: member.joinedAt,
         role: member.role,

@@ -13,4 +13,7 @@ export type IEnvironmentVariables = {
   MAIL_PASSWORD: string;
   RESET_PASSWORD_TOKEN_SECRET: string;
   CLIENT_URL: string;
+  CLOUDINARY_NAME: string;
+  CLOUDINARY_API_KEY: string;
+  CLOUDINARY_API_SECRET: string;
 };

@@ -9,4 +9,7 @@ export class SignupResponseDTO {
 
   @Expose()
   email: string;
+
+  @Expose()
+  avatar: string;
 }

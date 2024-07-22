@@ -38,4 +38,17 @@ export class RedisService {
     const refreshToken = await this.redis.get(`refresh_token:${userId}`);
     return refreshToken;
   };
+
+  setFilePublicId = async (encodeURL: string, publicId: string) => {
+    await this.redis.set(`file_public_id:${encodeURL}`, publicId);
+  };
+
+  getFilePublicId = async (encodeURL: string) => {
+    const publicId = await this.redis.get(`file_public_id:${encodeURL}`);
+    return publicId;
+  };
+
+  deleteFilePublicId = async (encodeURL: string) => {
+    await this.redis.del(`file_public_id:${encodeURL}`);
+  };
 }

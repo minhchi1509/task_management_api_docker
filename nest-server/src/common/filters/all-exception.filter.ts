@@ -39,19 +39,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
-      const exceptionResponseMessage: string | string[] | undefined = (
-        exception.getResponse() as any
-      )?.message;
-      message = Array.isArray(exceptionResponseMessage)
-        ? exceptionResponseMessage.join(', ')
-        : exceptionResponseMessage || 'Unknown error message';
+      if (statusCode !== HttpStatus.INTERNAL_SERVER_ERROR) {
+        const exceptionResponseMessage: string | string[] | undefined = (
+          exception.getResponse() as any
+        )?.message;
+        message = Array.isArray(exceptionResponseMessage)
+          ? exceptionResponseMessage.join(', ')
+          : exceptionResponseMessage || 'Unknown error message';
 
-      responseBody = {
-        ...responseBody,
-        ...(exception.getResponse() as object),
-        message,
-        statusCode
-      };
+        responseBody = {
+          ...responseBody,
+          ...(exception.getResponse() as object),
+          message,
+          statusCode
+        };
+      }
     }
 
     responseBody = plainToInstance(ExceptionResponse, responseBody, {

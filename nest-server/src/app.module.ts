@@ -21,6 +21,8 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AppClassSerializerInterceptor } from 'src/common/interceptors/app-class-serializer.interceptor';
 import { AppValidationPipe } from 'src/common/pipes/app-validation.pipe';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
+import { UserModule } from 'src/modules/apis/user/user.module';
+import { CloudinaryModule } from 'src/modules/libs/cloudinary/cloudinary.module';
 import { TokenModule } from 'src/modules/libs/token/token.module';
 
 @Module({
@@ -53,7 +55,10 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
         MAIL_HOST: Joi.string().required(),
         MAIL_PASSWORD: Joi.string().required(),
         MAIL_PORT: Joi.number().port().required(),
-        MAIL_USER: Joi.string().required().email()
+        MAIL_USER: Joi.string().required().email(),
+        CLOUDINARY_NAME: Joi.string().required(),
+        CLOUDINARY_API_KEY: Joi.string().required(),
+        CLOUDINARY_API_SECRET: Joi.string().required()
       })
     }),
     MailerModule.forRootAsync({
@@ -90,6 +95,16 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
       }),
       inject: [ConfigService]
     }),
+    CloudinaryModule.forRootAsync({
+      isGlobal: true,
+      useFactory: (configService: ConfigService<IEnvironmentVariables>) => ({
+        cloud_name: configService.get<string>('CLOUDINARY_NAME'),
+        api_key: configService.get<string>('CLOUDINARY_API_KEY'),
+        api_secret: configService.get<string>('CLOUDINARY_API_SECRET')
+      }),
+      inject: [ConfigService]
+    }),
+    UserModule,
     AuthModule,
     PrismaModule,
     RoomModule,

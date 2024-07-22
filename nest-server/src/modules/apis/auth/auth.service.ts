@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { DEFAULT_USER_AVATAR_URL } from 'src/common/constants/variables';
+import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 import { TResetPasswordMailData } from 'src/common/types/mail.type';
 import {
@@ -17,7 +19,6 @@ import { RefreshTokenBodyDto } from 'src/modules/apis/auth/dto/refresh-token/Ref
 import { RefreshTokenResponseDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenResponse.dto';
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
-import { SendResetPasswordMailResponseDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailResponse.dto';
 import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dto';
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
 import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
@@ -50,9 +51,11 @@ export class AuthService {
       data: {
         email,
         password: hashedPassword,
-        fullName
+        fullName,
+        avatar: DEFAULT_USER_AVATAR_URL
       }
     });
+
     return { ...createdUser };
   };
 
@@ -92,7 +95,7 @@ export class AuthService {
 
   sendResetPasswordMail = async (
     email: string
-  ): Promise<SendResetPasswordMailResponseDto> => {
+  ): Promise<MessageResponseDTO> => {
     const user = await this.prismaService.user
       .findUniqueOrThrow({ where: { email } })
       .catch(() => {
