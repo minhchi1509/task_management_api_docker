@@ -8,7 +8,7 @@ import {
   Put,
   UseGuards
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { CheckPermission } from 'src/common/decorators/metadata.decorator';
@@ -23,7 +23,7 @@ import { ModifyTaskTypePermissionHandler } from 'src/modules/permission-handler/
 
 @ApiTags('Task Type')
 @ApiBearerAuth()
-@ApiBadRequestResponse({ type: ExceptionResponse })
+@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
 @Controller('rooms/:roomId/task-type')
 @UseGuards(RoomGuard)
 export class TaskTypeController {

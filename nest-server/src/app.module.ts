@@ -2,6 +2,7 @@ import { BullModule } from '@nestjs/bull';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import Joi from 'joi';
@@ -103,6 +104,10 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
         api_secret: configService.get<string>('CLOUDINARY_API_SECRET')
       }),
       inject: [ConfigService]
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, 'common/assets/static'),
+      serveRoot: '/public/static'
     }),
     UserModule,
     AuthModule,

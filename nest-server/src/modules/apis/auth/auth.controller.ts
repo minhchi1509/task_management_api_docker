@@ -6,7 +6,7 @@ import {
   Post,
   Put
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { PublicRoute } from 'src/common/decorators/metadata.decorator';
@@ -24,7 +24,7 @@ import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dt
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
 
 @ApiTags('Auth')
-@ApiBadRequestResponse({ type: ExceptionResponse })
+@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
 @Controller('auth')
 @PublicRoute()
 export class AuthController {

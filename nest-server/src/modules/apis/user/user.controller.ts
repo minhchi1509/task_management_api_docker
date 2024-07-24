@@ -1,5 +1,5 @@
 import { Body, Controller, Put } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { UseFormData } from 'src/common/decorators/use-form-data.decorator';
@@ -13,7 +13,7 @@ import { UserService } from 'src/modules/apis/user/user.service';
 
 @ApiTags('User')
 @ApiBearerAuth()
-@ApiBadRequestResponse({ type: ExceptionResponse })
+@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}

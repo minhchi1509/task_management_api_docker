@@ -1,7 +1,7 @@
 import { DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger';
 
 export const swaggerConfig = new DocumentBuilder()
-  .setTitle('Task Management API')
+  .setTitle('Task Management APIs')
   .setDescription('The Task Management API description')
   .setVersion('1.0')
   .addBearerAuth({
@@ -13,5 +13,6 @@ export const swaggerConfig = new DocumentBuilder()
 
 export const swaggerOptions: SwaggerCustomOptions = {
   customSiteTitle: 'Task Management API',
-  customCss: '.swagger-ui section.models { display: none}'
+  customCss: '.swagger-ui section.models { display: none}',
+  customfavIcon: '/public/static/app-logo.svg'
 };
