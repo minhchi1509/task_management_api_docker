@@ -6,40 +6,25 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import Joi from 'joi';
-import { NestjsFormDataModule } from 'nestjs-form-data';
 import { join } from 'path';
 
-import { AuthModule } from './modules/apis/auth/auth.module';
 import { AwardModule } from './modules/apis/award/award.module';
 import { CommentModule } from './modules/apis/comment/comment.module';
 import { RoomModule } from './modules/apis/room/room.module';
 import { TaskModule } from './modules/apis/task/task.module';
 import { TaskTypeModule } from './modules/apis/task-type/task-type.module';
-import { PrismaModule } from './modules/libs/prisma/prisma.module';
-import { RedisModule } from './modules/libs/redis/redis.module';
 import { AllExceptionsFilter } from 'src/common/filters/all-exception.filter';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AppClassSerializerInterceptor } from 'src/common/interceptors/app-class-serializer.interceptor';
 import { AppValidationPipe } from 'src/common/pipes/app-validation.pipe';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
+import { AuthModule } from 'src/modules/apis/auth/auth.module';
 import { UserModule } from 'src/modules/apis/user/user.module';
-import { CloudinaryModule } from 'src/modules/libs/cloudinary/cloudinary.module';
+import { FirebaseModule } from 'src/modules/libs/firebase/firebase.module';
 import { TokenModule } from 'src/modules/libs/token/token.module';
 
 @Module({
   imports: [
-    NestjsFormDataModule.config({ isGlobal: true }),
-    TokenModule,
-    RedisModule.forRootAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService<IEnvironmentVariables>) => ({
-        host: configService.get<string>('REDIS_HOST'),
-        port: configService.get<number>('REDIS_PORT'),
-        password: configService.get<string>('REDIS_PASSWORD')
-      }),
-      inject: [ConfigService]
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object<IEnvironmentVariables>({
@@ -59,7 +44,10 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
         MAIL_USER: Joi.string().required().email(),
         CLOUDINARY_NAME: Joi.string().required(),
         CLOUDINARY_API_KEY: Joi.string().required(),
-        CLOUDINARY_API_SECRET: Joi.string().required()
+        CLOUDINARY_API_SECRET: Joi.string().required(),
+        FIREBASE_PROJECT_ID: Joi.string().required(),
+        FIREBASE_PRIVATE_KEY: Joi.string().required(),
+        FIREBASE_CLIENT_EMAIL: Joi.string().required()
       })
     }),
     MailerModule.forRootAsync({
@@ -96,29 +84,20 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
       }),
       inject: [ConfigService]
     }),
-    CloudinaryModule.forRootAsync({
-      isGlobal: true,
-      useFactory: (configService: ConfigService<IEnvironmentVariables>) => ({
-        cloud_name: configService.get<string>('CLOUDINARY_NAME'),
-        api_key: configService.get<string>('CLOUDINARY_API_KEY'),
-        api_secret: configService.get<string>('CLOUDINARY_API_SECRET')
-      }),
-      inject: [ConfigService]
-    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'common/assets/static'),
       serveRoot: '/public/static'
     }),
+    FirebaseModule,
+    TokenModule,
     UserModule,
     AuthModule,
-    PrismaModule,
     RoomModule,
     TaskTypeModule,
     TaskModule,
     CommentModule,
     AwardModule
   ],
-  controllers: [],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_PIPE, useClass: AppValidationPipe },

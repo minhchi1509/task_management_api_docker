@@ -1,14 +1,19 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Redis, RedisOptions } from 'ioredis';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Redis } from 'ioredis';
 
-import { EProviderKey } from 'src/common/constants/provider-key.constant';
+import { IEnvironmentVariables } from 'src/common/types/env.type';
 
 @Injectable()
 export class RedisProvider extends Redis implements OnModuleInit {
   private readonly logger = new Logger(RedisProvider.name);
 
-  constructor(@Inject(EProviderKey.REDIS_OPTIONS) options: RedisOptions) {
-    super(options);
+  constructor(private configService: ConfigService<IEnvironmentVariables>) {
+    super({
+      host: configService.get<string>('REDIS_HOST'),
+      port: configService.get<number>('REDIS_PORT'),
+      password: configService.get<string>('REDIS_PASSWORD')
+    });
   }
 
   async onModuleInit() {

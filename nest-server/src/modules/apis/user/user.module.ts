@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+import { NestjsFormDataModule } from 'nestjs-form-data';
 
 import { UserController } from 'src/modules/apis/user/user.controller';
 import { UserService } from 'src/modules/apis/user/user.service';
 import { BcryptModule } from 'src/modules/libs/bcrypt/bcrypt.module';
+import { CloudinaryModule } from 'src/modules/libs/cloudinary/cloudinary.module';
+import { PrismaModule } from 'src/modules/libs/prisma/prisma.module';
 
 @Module({
-  imports: [BcryptModule],
+  imports: [BcryptModule, PrismaModule, CloudinaryModule, NestjsFormDataModule],
   controllers: [UserController],
   providers: [UserService]
 })

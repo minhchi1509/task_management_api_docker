@@ -4,6 +4,7 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import admin from 'firebase-admin';
 
 import { DEFAULT_USER_AVATAR_URL } from 'src/common/constants/variables';
 import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
@@ -201,6 +202,24 @@ export class AuthService {
       accessToken: newAccessToken,
       expiresIn,
       refreshToken: newRefreshToken
+    };
+  };
+
+  sendPushNotification = async () => {
+    await admin.messaging().sendEachForMulticast({
+      tokens: [
+        'e2mpTRxurQ9TB_rg54yrvb:APA91bG42_wt5PDbYH_LGwzRomOX9JUR1-A8eFtgbcrJLy_lQ8YdmoL_LwfnQVoQcKhIQJzsBGUZdAP3xwD0_8XmqcEG6RuomaOfe6rtoH0CoiAYF55hgS1UTXcSKcKs6vuY0AIJkFY2'
+      ],
+      notification: {
+        title: 'Hello',
+        body: 'Hello, this is a push notification'
+      },
+      data: {
+        type: 'TEST'
+      }
+    });
+    return {
+      message: 'Push notification sent successfully'
     };
   };
 }

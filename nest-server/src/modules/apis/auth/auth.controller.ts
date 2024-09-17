@@ -66,4 +66,10 @@ export class AuthController {
     const response = await this.authService.refreshToken(body);
     return plainToInstance(RefreshTokenResponseDto, response);
   }
+
+  @Post('send-push-notification')
+  async sendPushNotification(): Promise<MessageResponseDTO> {
+    const response = await this.authService.sendPushNotification();
+    return plainToInstance(MessageResponseDTO, response);
+  }
 }
