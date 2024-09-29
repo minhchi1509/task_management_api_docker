@@ -1,16 +1,16 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 import { Trim } from 'src/common/decorators/sanitizer/trim.sanitizer';
+import { TwoFactorCodeBodyDTO } from 'src/common/dto/TwoFactorCodeBody.dto';
 
-export class LoginBodyDTO {
+export class LoginBodyDTO extends TwoFactorCodeBodyDTO {
   @Trim()
-  @IsNotEmpty()
-  @IsString()
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @Trim()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   password: string;
 }

@@ -1,35 +1,38 @@
 import {
   Body,
   Controller,
+  Headers,
   HttpCode,
   HttpStatus,
   Post,
-  Put
+  Put,
+  ValidationPipe
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
+import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { PublicRoute } from 'src/common/decorators/metadata.decorator';
-import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { RequestHeader } from 'src/common/decorators/request-object.decorator';
 import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
-import { AuthService } from 'src/modules/apis/auth/auth.service';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
+import { LoginExceptionResponseDTO } from 'src/modules/apis/auth/dto/login/LoginExceptionResponse.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
-import { RefreshTokenBodyDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenBody.dto';
-import { RefreshTokenResponseDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenResponse.dto';
+import { RefreshTokenHeaderDTO } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenHeader.dto';
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
 import { SendResetPasswordMailBodyDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailBody.dto';
 import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dto';
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
+import { AuthService } from 'src/modules/apis/auth/services/auth.service';
 
 @ApiTags('Auth')
-@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
 @Controller('auth')
 @PublicRoute()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiExceptionResponse()
   @Post('signup')
   async signup(@Body() body: SignupRequestDTO): Promise<SignupResponseDTO> {
     const response = await this.authService.signup(body);
@@ -37,12 +40,17 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiExceptionResponse({
+    type: LoginExceptionResponseDTO,
+    status: HttpStatus.BAD_REQUEST
+  })
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: LoginBodyDTO): Promise<LoginResponseDTO> {
     const response = await this.authService.login(body);
     return plainToInstance(LoginResponseDTO, response);
   }
 
+  @ApiExceptionResponse()
   @Post('send-reset-password-mail')
   async sendResetPasswordMail(
     @Body() body: SendResetPasswordMailBodyDto
@@ -51,6 +59,7 @@ export class AuthController {
     return plainToInstance(MessageResponseDTO, response);
   }
 
+  @ApiExceptionResponse()
   @Put('reset-password')
   async resetPassword(
     @Body() body: ResetPasswordBodyDto
@@ -59,14 +68,25 @@ export class AuthController {
     return plainToInstance(ResetPasswordResponseDto, response);
   }
 
+  @ApiExceptionResponse()
   @Post('refresh-token')
   async refreshToken(
-    @Body() body: RefreshTokenBodyDto
-  ): Promise<RefreshTokenResponseDto> {
-    const response = await this.authService.refreshToken(body);
-    return plainToInstance(RefreshTokenResponseDto, response);
+    @Headers()
+    @RequestHeader(
+      new ValidationPipe({
+        validateCustomDecorators: true,
+        transform: true,
+        stopAtFirstError: true
+      })
+    )
+    headers: RefreshTokenHeaderDTO
+  ): Promise<LoginResponseDTO> {
+    const { refreshToken } = headers;
+    const response = await this.authService.refreshToken(refreshToken);
+    return plainToInstance(LoginResponseDTO, response);
   }
 
+  @ApiExceptionResponse()
   @Post('send-push-notification')
   async sendPushNotification(): Promise<MessageResponseDTO> {
     const response = await this.authService.sendPushNotification();

@@ -5,7 +5,8 @@ export class AppValidationPipe extends ValidationPipe {
   constructor() {
     super({
       whitelist: true,
-      transform: true
+      transform: true,
+      stopAtFirstError: true
     });
   }
 }

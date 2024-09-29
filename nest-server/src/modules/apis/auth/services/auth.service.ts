@@ -1,12 +1,15 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import admin from 'firebase-admin';
+import { authenticator } from 'otplib';
 
-import { DEFAULT_USER_AVATAR_URL } from 'src/common/constants/variables';
+import { DEFAULT_USER_AVATAR_URL } from 'src/common/constants/common.constant';
+import { ELoginExceptionErrorType } from 'src/common/constants/common.enum';
 import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 import { TResetPasswordMailData } from 'src/common/types/mail.type';
@@ -16,12 +19,11 @@ import {
 } from 'src/common/types/token.type';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
-import { RefreshTokenBodyDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenBody.dto';
-import { RefreshTokenResponseDto } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenResponse.dto';
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
 import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dto';
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
+import { LoginException } from 'src/modules/apis/auth/exceptions/LoginException';
 import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
 import { MailQueueService } from 'src/modules/libs/job-queue/mail-queue/mail-queue.service';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
@@ -61,24 +63,62 @@ export class AuthService {
   };
 
   login = async (body: LoginBodyDTO): Promise<LoginResponseDTO> => {
-    const { email, password } = body;
+    const { email, password, otpCode } = body;
     const user = await this.prismaService.user
       .findFirstOrThrow({
         where: { email }
       })
       .catch(() => {
-        throw new BadRequestException(
-          'Email is not associated with any account'
-        );
+        throw new LoginException({
+          message: 'Email is not associated with any account',
+          errorType: ELoginExceptionErrorType.INVALID_CREDENTIALS
+        });
       });
+
+    if (!user.password) {
+      throw new LoginException({
+        message: 'Account has no password. Login with OAuth instead',
+        errorType: ELoginExceptionErrorType.INVALID_CREDENTIALS
+      });
+    }
 
     const isPasswordMatched = await this.bcryptService.isMatch(
       password,
       user.password
     );
     if (!isPasswordMatched) {
-      throw new BadRequestException('Wrong password');
+      throw new LoginException({
+        message: 'Wrong password',
+        errorType: ELoginExceptionErrorType.INVALID_CREDENTIALS
+      });
     }
+
+    if (user.isEnableTwoFactorAuth) {
+      if (!otpCode) {
+        throw new LoginException({
+          message: 'Two factor authenticator code is required',
+          errorType: ELoginExceptionErrorType.REQUIRED_2FA_OTP
+        });
+      }
+      const twofaSecretKey = await this.redisService.getTwoFASecretKey(user.id);
+      if (!twofaSecretKey) {
+        throw new InternalServerErrorException(
+          `Can not find 2FA secret key of user with id: ${user.id} in database`
+        );
+      }
+      const isValidOtp = authenticator.verify({
+        secret: twofaSecretKey,
+        token: otpCode
+      });
+
+      if (!isValidOtp) {
+        throw new LoginException({
+          message: 'Two factor authenticator code is invalid',
+          errorType: ELoginExceptionErrorType.INVALID_2FA_OTP
+        });
+      }
+    }
+
     const jwtPayload: TJWTPayload = { sub: user.id, email: user.email };
     const { token: accessToken, expiresIn } =
       await this.tokenService.signAccessToken(jwtPayload);
@@ -121,7 +161,7 @@ export class AuthService {
     await this.redisService.setResetPasswordToken(email, resetPasswordToken);
     await this.mailQueueService.sendResetPasswordMail(resetPasswordMailData);
     return {
-      message: 'A mail has been sent to the email successfully!'
+      message: 'A reset password mail has been sent to your email successfully!'
     };
   };
 
@@ -158,11 +198,7 @@ export class AuthService {
     };
   };
 
-  refreshToken = async (
-    body: RefreshTokenBodyDto
-  ): Promise<RefreshTokenResponseDto> => {
-    const { refreshToken } = body;
-
+  refreshToken = async (refreshToken: string): Promise<LoginResponseDTO> => {
     const decodeRefreshToken =
       await this.tokenService.verifyRefreshToken(refreshToken);
 
@@ -215,7 +251,7 @@ export class AuthService {
         body: 'Hello, this is a push notification'
       },
       data: {
-        type: 'TEST'
+        link: '/products'
       }
     });
     return {

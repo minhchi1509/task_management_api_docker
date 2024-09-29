@@ -19,4 +19,8 @@ export type IEnvironmentVariables = {
   FIREBASE_PROJECT_ID: string;
   FIREBASE_PRIVATE_KEY: string;
   FIREBASE_CLIENT_EMAIL: string;
+  GOOGLE_AUTH_CLIENT_ID: string;
+  GOOGLE_AUTH_CLIENT_SECRET: string;
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
 };

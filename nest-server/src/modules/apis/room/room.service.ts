@@ -109,7 +109,8 @@ export class RoomService {
           id: member.user.id,
           fullName: member.user.fullName,
           email: member.user.email,
-          avatar: member.user.avatar
+          avatar: member.user.avatar,
+          isEnableTwoFactorAuth: member.user.isEnableTwoFactorAuth
         },
         joinedAt: member.joinedAt,
         role: member.role,

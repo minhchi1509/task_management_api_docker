@@ -12,3 +12,16 @@ export enum ETokenExpiration {
 export enum ERequestPayloadKey {
   USER = 'user'
 }
+
+export enum EHeaderKey {
+  REFRESH_TOKEN = 'x-refresh-token',
+  TWO_FACTOR_AUTH_SECRET_KEY = 'x-2fa-secret-key',
+  GOOGLE_ID_TOKEN = 'x-google-id-token',
+  GITHUB_ACCESS_TOKEN = 'x-github-access-token'
+}
+
+export enum ELoginExceptionErrorType {
+  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
+  REQUIRED_2FA_OTP = 'REQUIRED_2FA_OTP',
+  INVALID_2FA_OTP = 'INVALID_2FA_OTP'
+}

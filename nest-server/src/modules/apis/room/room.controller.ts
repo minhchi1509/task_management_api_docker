@@ -8,12 +8,12 @@ import {
   Post,
   UseGuards
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
+import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { CheckPermission } from 'src/common/decorators/metadata.decorator';
-import { UserId } from 'src/common/decorators/user.decorator';
-import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { UserId } from 'src/common/decorators/request-object.decorator';
 import { RoomGuard } from 'src/common/guards/room.guard';
 import { CreateRoomBodyDTO } from 'src/modules/apis/room/dto/create-room/CreateRoomBody.dto';
 import { CreateRoomResponseDTO } from 'src/modules/apis/room/dto/create-room/CreateRoomResponse.dto';
@@ -24,7 +24,7 @@ import { RoomService } from 'src/modules/apis/room/room.service';
 import { GetRoomMemberPermissionHandler } from 'src/modules/permission-handler/room/handlers/GetRoomMemberPermissionHandler';
 
 @ApiTags('Room')
-@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
+@ApiExceptionResponse()
 @ApiBearerAuth()
 @Controller('room')
 @UseGuards(RoomGuard)

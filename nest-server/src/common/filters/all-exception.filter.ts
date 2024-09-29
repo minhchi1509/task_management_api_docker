@@ -6,10 +6,9 @@ import {
   HttpStatus,
   Logger
 } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 
-import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { BaseExceptionResponse } from 'src/common/dto/BaseExceptionResponse.dto';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -31,7 +30,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   ): void {
     let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string = 'Internal server error';
-    let responseBody: any = {
+    let responseBody: BaseExceptionResponse = {
       statusCode,
       message,
       path: request.url
@@ -47,18 +46,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
           ? exceptionResponseMessage.join(', ')
           : exceptionResponseMessage || 'Unknown error message';
 
+        const { error, ...extraErrorFields } = exception.getResponse() as any;
+
         responseBody = {
           ...responseBody,
-          ...(exception.getResponse() as object),
+          ...extraErrorFields,
           message,
           statusCode
         };
       }
     }
-
-    responseBody = plainToInstance(ExceptionResponse, responseBody, {
-      excludeExtraneousValues: true
-    });
 
     response.status(statusCode).json(responseBody);
   }

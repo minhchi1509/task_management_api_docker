@@ -2,7 +2,7 @@ import { Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 } from 'cloudinary';
 
-import { EProviderKey } from 'src/common/constants/provider-key.constant';
+import { EProviderKey } from 'src/common/constants/provider-key.enum';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 
 export const CloudinaryProvider: Provider = {

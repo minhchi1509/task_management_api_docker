@@ -51,4 +51,17 @@ export class RedisService {
   deleteFilePublicId = async (encodeURL: string) => {
     await this.redis.del(`file_public_id:${encodeURL}`);
   };
+
+  setTwoFASecretKey = async (userId: string, secretKey: string) => {
+    await this.redis.set(`two_fa_secret_key:${userId}`, secretKey);
+  };
+
+  getTwoFASecretKey = async (userId: string) => {
+    const secretKey = await this.redis.get(`two_fa_secret_key:${userId}`);
+    return secretKey;
+  };
+
+  deleteTwoFASecretKey = async (userId: string) => {
+    await this.redis.del(`two_fa_secret_key:${userId}`);
+  };
 }

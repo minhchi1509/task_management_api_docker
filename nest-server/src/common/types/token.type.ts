@@ -11,3 +11,10 @@ export type TSignTokenResponse = {
   token: string;
   expiresIn: number;
 };
+
+export type TGithubUserResponse = {
+  login: string;
+  name: string;
+  email: string;
+  avatar_url: string;
+};

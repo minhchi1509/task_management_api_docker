@@ -12,4 +12,7 @@ export class UserResponseDTO {
 
   @Expose()
   avatar: string;
+
+  @Expose()
+  isEnableTwoFactorAuth: boolean;
 }

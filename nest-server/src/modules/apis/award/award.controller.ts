@@ -8,12 +8,12 @@ import {
   Put,
   UseGuards
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
+import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { CheckPermission } from 'src/common/decorators/metadata.decorator';
-import { UserId } from 'src/common/decorators/user.decorator';
-import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { UserId } from 'src/common/decorators/request-object.decorator';
 import { RoomGuard } from 'src/common/guards/room.guard';
 import { AwardService } from 'src/modules/apis/award/award.service';
 import { CreateAwardBodyDTO } from 'src/modules/apis/award/dto/create-award/CreateAwardBody.dto';
@@ -30,7 +30,7 @@ import { ReceiveAwardPermissionHandler } from 'src/modules/permission-handler/aw
 
 @ApiTags('Award')
 @ApiBearerAuth()
-@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
+@ApiExceptionResponse()
 @Controller('rooms/:roomId/awards')
 @UseGuards(RoomGuard)
 export class AwardController {

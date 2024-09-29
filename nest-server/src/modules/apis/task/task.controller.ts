@@ -9,12 +9,12 @@ import {
   Query,
   UseGuards
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
+import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { CheckPermission } from 'src/common/decorators/metadata.decorator';
-import { UserId } from 'src/common/decorators/user.decorator';
-import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { UserId } from 'src/common/decorators/request-object.decorator';
 import { RoomGuard } from 'src/common/guards/room.guard';
 import { CreateTaskResponseDTO } from 'src/modules/apis/task/dto/create-task/CreateTaskResponse.dto';
 import { CreateTaskBodyDTO } from 'src/modules/apis/task/dto/create-task/CreatTaskBody.dto';
@@ -35,7 +35,7 @@ import { UpdateSubTaskPermissionHandler } from 'src/modules/permission-handler/t
 
 @ApiTags('Task')
 @ApiBearerAuth()
-@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
+@ApiExceptionResponse()
 @Controller('rooms/:roomId/tasks')
 @UseGuards(RoomGuard)
 export class TaskController {

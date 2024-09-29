@@ -2,7 +2,7 @@ import { Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import admin from 'firebase-admin';
 
-import { EProviderKey } from 'src/common/constants/provider-key.constant';
+import { EProviderKey } from 'src/common/constants/provider-key.enum';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 
 export const FirebaseProvider: Provider = {

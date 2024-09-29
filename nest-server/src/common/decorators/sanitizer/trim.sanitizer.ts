@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { Transform } from 'class-transformer';
 
 interface ITrimOptions {

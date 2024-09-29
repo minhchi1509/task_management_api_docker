@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
-import { EProviderKey } from 'src/common/constants/provider-key.constant';
+import { EProviderKey } from 'src/common/constants/provider-key.enum';
 import {
   IShortIdModuleAsyncOptions,
   IShortIdModuleOptions

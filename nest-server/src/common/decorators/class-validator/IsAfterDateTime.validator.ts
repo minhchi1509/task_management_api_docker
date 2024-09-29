@@ -1,5 +1,4 @@
 /* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable @typescript-eslint/ban-types */
 import { registerDecorator, ValidationOptions } from 'class-validator';
 import dayjs from 'dayjs';
 
@@ -7,7 +6,7 @@ export const IsAfterDateTime = (
   compareValue: { value?: Date | string; relatedProperty?: string },
   validationOptions?: ValidationOptions
 ) => {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'isAfterDateTime',
       target: object.constructor,

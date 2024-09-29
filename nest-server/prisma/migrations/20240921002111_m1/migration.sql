@@ -3,7 +3,8 @@ CREATE TABLE `user` (
     `id` VARCHAR(191) NOT NULL,
     `full_name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
-    `password` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NULL,
+    `avatar` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `user_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -27,6 +28,7 @@ CREATE TABLE `room_member` (
     `user_id` VARCHAR(191) NOT NULL,
     `room_id` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `room_member_user_id_room_id_key`(`user_id`, `room_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -26,7 +26,6 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
       validationSchema: Joi.object<IEnvironmentVariables>({
         NODE_ENV: Joi.string().required().valid('development', 'production'),
         CLIENT_URL: Joi.string().required().uri(),
@@ -47,10 +46,15 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
         CLOUDINARY_API_SECRET: Joi.string().required(),
         FIREBASE_PROJECT_ID: Joi.string().required(),
         FIREBASE_PRIVATE_KEY: Joi.string().required(),
-        FIREBASE_CLIENT_EMAIL: Joi.string().required()
+        FIREBASE_CLIENT_EMAIL: Joi.string().required(),
+        GOOGLE_AUTH_CLIENT_ID: Joi.string().required(),
+        GOOGLE_AUTH_CLIENT_SECRET: Joi.string().required(),
+        GITHUB_CLIENT_ID: Joi.string().required(),
+        GITHUB_CLIENT_SECRET: Joi.string().required()
       })
     }),
     MailerModule.forRootAsync({
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService<IEnvironmentVariables>) => ({
         transport: {
           host: configService.get<string>('MAIL_HOST'),
@@ -75,6 +79,7 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
       inject: [ConfigService]
     }),
     BullModule.forRootAsync({
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService<IEnvironmentVariables>) => ({
         redis: {
           host: configService.get<string>('REDIS_HOST'),

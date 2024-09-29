@@ -8,12 +8,12 @@ import {
   Put,
   UseGuards
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
+import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { CheckPermission } from 'src/common/decorators/metadata.decorator';
-import { UserId } from 'src/common/decorators/user.decorator';
-import { ExceptionResponse } from 'src/common/dto/ExceptionResponse.dto';
+import { UserId } from 'src/common/decorators/request-object.decorator';
 import { RoomGuard } from 'src/common/guards/room.guard';
 import { CommentService } from 'src/modules/apis/comment/comment.service';
 import { CreateCommentBodyDTO } from 'src/modules/apis/comment/dto/create-comment/CreateCommentBody.dto';
@@ -29,7 +29,7 @@ import { UpdateCommentPermissionHandler } from 'src/modules/permission-handler/c
 
 @ApiTags('Comment')
 @ApiBearerAuth()
-@ApiResponse({ type: ExceptionResponse, status: '4XX', description: 'Error' })
+@ApiExceptionResponse()
 @Controller('rooms/:roomId/tasks/:taskId/comments')
 @UseGuards(RoomGuard)
 export class CommentController {

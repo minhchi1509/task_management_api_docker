@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
 
+import { REDIS_MAX_RETRY } from 'src/common/constants/common.constant';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class RedisProvider extends Redis implements OnModuleInit {
 
   constructor(private configService: ConfigService<IEnvironmentVariables>) {
     super({
+      maxRetriesPerRequest: REDIS_MAX_RETRY,
       host: configService.get<string>('REDIS_HOST'),
       port: configService.get<number>('REDIS_PORT'),
       password: configService.get<string>('REDIS_PASSWORD')

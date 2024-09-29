@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class ExceptionResponse {
+export class BaseExceptionResponse {
   @Expose()
   statusCode: number;
 
