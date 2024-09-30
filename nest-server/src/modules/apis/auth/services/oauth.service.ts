@@ -6,6 +6,8 @@ import { authenticator } from 'otplib';
 import { ELoginExceptionErrorType } from 'src/common/constants/common.enum';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 import { TGithubUserResponse, TJWTPayload } from 'src/common/types/token.type';
+import { GithubLoginBodyDTO } from 'src/modules/apis/auth/dto/github-login/GithubLoginBody.dto';
+import { GoogleLoginBodyDTO } from 'src/modules/apis/auth/dto/google-login/GoogleLoginBody.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
 import { LoginException } from 'src/modules/apis/auth/exceptions/LoginException';
 import { GoogleOAuthService } from 'src/modules/libs/google-oauth/google-oauth.service';
@@ -24,12 +26,10 @@ export class OAuthService {
     private configService: ConfigService<IEnvironmentVariables>
   ) {}
 
-  googleLogin = async (
-    idToken: string,
-    otpCode?: string
-  ): Promise<LoginResponseDTO> => {
+  googleLogin = async (body: GoogleLoginBodyDTO): Promise<LoginResponseDTO> => {
+    const { googleIdToken, otpCode } = body;
     const { email, picture, name } =
-      await this.googleOAuthService.verifyIdToken(idToken);
+      await this.googleOAuthService.verifyIdToken(googleIdToken);
 
     if (!email || !picture || !name) {
       throw new LoginException({
@@ -100,10 +100,8 @@ export class OAuthService {
     };
   };
 
-  githubLogin = async (
-    githubAccessToken: string,
-    otpCode?: string
-  ): Promise<LoginResponseDTO> => {
+  githubLogin = async (body: GithubLoginBodyDTO): Promise<LoginResponseDTO> => {
+    const { githubAccessToken, otpCode } = body;
     const githubUserInfor = {
       email: '',
       fullName: '',
