@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import { registerDecorator, ValidationOptions } from 'class-validator';
 import dayjs from 'dayjs';
 

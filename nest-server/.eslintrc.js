@@ -1,55 +1,55 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: "tsconfig.json",
+    project: 'tsconfig.json',
     tsconfigRootDir: __dirname,
-    sourceType: "module",
+    sourceType: 'module'
   },
-  plugins: ["simple-import-sort"],
+  plugins: ['simple-import-sort'],
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
-    "plugin:prettier/recommended",
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
+    'plugin:prettier/recommended'
   ],
   root: true,
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       node: {
-        paths: ["./src"],
-        extensions: [".js", ".ts"],
+        paths: ['./src'],
+        extensions: ['.js', '.ts']
       },
       typescript: {
-        project: "./tsconfig.json",
-      },
-    },
+        project: './tsconfig.json'
+      }
+    }
   },
   env: {
     node: true,
-    jest: true,
+    jest: true
   },
   rules: {
-    "prettier/prettier": "error",
-    "no-unused-vars": "off",
-    "no-empty": "off",
-    "no-console": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/consistent-type-exports": "error",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-object-type": "off",
-    "@typescript-eslint/no-restricted-imports": [
-      "error",
-      { patterns: ["../*"] },
+    'prettier/prettier': 'error',
+    'no-unused-vars': 'off',
+    'no-empty': 'off',
+    'no-console': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/consistent-type-exports': 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-empty-object-type': 'off',
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      { patterns: ['../*'] }
     ],
-    "simple-import-sort/imports": [
-      "error",
+    'simple-import-sort/imports': [
+      'error',
       {
-        groups: [["^(?!\\.)"], ["^\\u0000", "^\\.", "^src/"]],
-      },
+        groups: [['^(?!\\.)'], ['^\\u0000', '^\\.', '^src/']]
+      }
     ],
-    "simple-import-sort/exports": "error",
-    "import/newline-after-import": "error",
-  },
+    'simple-import-sort/exports': 'error',
+    'import/newline-after-import': 'error'
+  }
 };
