@@ -25,7 +25,7 @@ import { SignupRequestDTO } from 'src/modules/apis/auth/dto/signup/SignupBody.dt
 import { SignupResponseDTO } from 'src/modules/apis/auth/dto/signup/SignupResponse.dto';
 import { LoginException } from 'src/modules/apis/auth/exceptions/LoginException';
 import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
-import { MailQueueService } from 'src/modules/libs/job-queue/mail-queue/mail-queue.service';
+import { MailQueueService } from 'src/modules/libs/job-queue/mail-queue/providers/mail-queue.service';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
 import { RedisService } from 'src/modules/libs/redis/redis.service';
 import { TokenService } from 'src/modules/libs/token/token.service';

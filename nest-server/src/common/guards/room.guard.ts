@@ -11,20 +11,16 @@ import {
 import { ModuleRef, Reflector } from '@nestjs/core';
 import { RoomMember, RoomRole } from '@prisma/client';
 
+import { EMetadataKey } from 'src/common/constants/common.enum';
 import {
   EAwardActions,
   ESubTaskActions,
   ETaskActions,
   ETaskCommentActions,
   ETaskTypeActions
-} from 'src/common/constants/actions.enum';
-import {
-  EMetadataKey,
-  ERequestPayloadKey
-} from 'src/common/constants/common.enum';
-import { IPermissionHandler } from 'src/common/types/permission.type';
+} from 'src/common/constants/room-actions.enum';
+import { IPermissionHandler, IRequest } from 'src/common/types/common.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
-import { TJWTPayload } from 'src/common/types/token.type';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
 
 @Injectable()
@@ -36,7 +32,7 @@ export class RoomGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<IRequest>();
     const policy = this.reflector.getAllAndOverride<
       Type<IPermissionHandler<TRoomAbility>> | undefined
     >(EMetadataKey.CHECK_PERMISSION, [
@@ -49,7 +45,7 @@ export class RoomGuard implements CanActivate {
     }
 
     const roomId = request.params.roomId;
-    const user: TJWTPayload = request[ERequestPayloadKey.USER];
+    const { user } = request;
     const roomMember = await this.prismaService.roomMember
       .findFirstOrThrow({
         where: { roomId, userId: user.sub }

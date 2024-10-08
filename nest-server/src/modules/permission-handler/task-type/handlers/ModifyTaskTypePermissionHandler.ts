@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { ETaskTypeActions } from 'src/common/constants/actions.enum';
-import { IPermissionHandler } from 'src/common/types/permission.type';
+import { ETaskTypeActions } from 'src/common/constants/room-actions.enum';
+import { IPermissionHandler } from 'src/common/types/common.type';
 import { TRoomAbility } from 'src/common/types/room-ability.type';
 
 @Injectable()

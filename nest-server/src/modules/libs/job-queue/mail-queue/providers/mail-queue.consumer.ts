@@ -18,6 +18,6 @@ export class MailConsumer {
       template: './reset-password',
       context: data.context
     });
-    console.log('Mail has been sent successfully!');
+    console.log('Reset password mail has been sent successfully!');
   }
 }

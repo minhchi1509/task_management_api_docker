@@ -5,11 +5,11 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { WinstonModule } from 'nest-winston';
 
 import { AppModule } from './app.module';
-import { winstonLogger } from 'src/common/logger/logger.config';
+import { winstonLogger } from 'src/common/configs/logger.config';
 import {
   swaggerConfig,
   swaggerOptions
-} from 'src/common/swagger/swagger.config';
+} from 'src/common/configs/swagger.config';
 import { IEnvironmentVariables } from 'src/common/types/env.type';
 
 async function bootstrap() {

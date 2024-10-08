@@ -4,31 +4,39 @@ import { plainToInstance } from 'class-transformer';
 
 import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { PublicRoute } from 'src/common/decorators/metadata.decorator';
-import { GithubLoginBodyDTO } from 'src/modules/apis/auth/dto/github-login/GithubLoginBody.dto';
-import { GoogleLoginBodyDTO } from 'src/modules/apis/auth/dto/google-login/GoogleLoginBody.dto';
+import { LoginExceptionResponseDTO } from 'src/modules/apis/auth/dto/login/LoginExceptionResponse.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
+import { OAuthLoginBodyDTO } from 'src/modules/apis/auth/dto/oauth-login/OAuthLoginBody.dto';
 import { OAuthService } from 'src/modules/apis/auth/services/oauth.service';
 
 @ApiTags('OAuth')
-@ApiExceptionResponse()
 @Controller('oauth')
 @PublicRoute()
 export class OAuthController {
   constructor(private oauthService: OAuthService) {}
 
+  @ApiExceptionResponse({ type: LoginExceptionResponseDTO })
   @Post('google/login')
   async googleLogin(
-    @Body() body: GoogleLoginBodyDTO
+    @Body() body: OAuthLoginBodyDTO
   ): Promise<LoginResponseDTO> {
     const response = await this.oauthService.googleLogin(body);
     return plainToInstance(LoginResponseDTO, response);
   }
 
-  @Post('github/login')
-  async githubLogin(
-    @Body() body: GithubLoginBodyDTO
-  ): Promise<LoginResponseDTO> {
-    const response = await this.oauthService.githubLogin(body);
-    return plainToInstance(LoginResponseDTO, response);
-  }
+  // @ApiExceptionResponse({ type: LoginExceptionResponseDTO })
+  // @Post('github/login')
+  // async githubLogin(
+  //   @Body() body: GithubLoginBodyDTO
+  // ): Promise<LoginResponseDTO> {
+  //   const response = await this.oauthService.githubLogin(body);
+  //   return plainToInstance(LoginResponseDTO, response);
+  // }
+
+  // @ApiExceptionResponse({ type: LoginExceptionResponseDTO })
+  // @Post('azure-ad/login')
+  // async azureAdLogin(): Promise<LoginResponseDTO> {
+  //   const response = await this.oauthService.azureAdLogin('a');
+  //   return plainToInstance(LoginResponseDTO, response);
+  // }
 }

@@ -33,7 +33,7 @@ model User {
   id                    String  @id @default(uuid())
   fullName              String  @map("full_name")
   email                 String  @unique
-  password              String?
+  password              String
   avatar                String
   isEnableTwoFactorAuth Boolean @default(false) @map("is_enable_two_factor_auth")
 

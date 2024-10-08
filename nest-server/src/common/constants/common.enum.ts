@@ -9,10 +9,6 @@ export enum ETokenExpiration {
   RESET_PASSWORD_TOKEN = 5 * 60
 }
 
-export enum ERequestPayloadKey {
-  USER = 'user'
-}
-
 export enum EHeaderKey {
   REFRESH_TOKEN = 'x-refresh-token',
   TWO_FACTOR_AUTH_SECRET_KEY = 'x-2fa-secret-key',
@@ -23,5 +19,6 @@ export enum EHeaderKey {
 export enum ELoginExceptionErrorType {
   INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
   REQUIRED_2FA_OTP = 'REQUIRED_2FA_OTP',
-  INVALID_2FA_OTP = 'INVALID_2FA_OTP'
+  INVALID_2FA_OTP = 'INVALID_2FA_OTP',
+  REQUIRED_INITIALIZE_PASSWORD = 'REQUIRED_INITIALIZE_PASSWORD'
 }

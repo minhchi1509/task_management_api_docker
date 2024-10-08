@@ -1,4 +1,3 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -21,8 +20,7 @@ import { TokenModule } from 'src/modules/libs/token/token.module';
     RedisModule,
     PrismaModule,
     GoogleOAuthModule,
-    ConfigModule,
-    HttpModule
+    ConfigModule
   ],
   controllers: [AuthController, OAuthController],
   providers: [AuthService, OAuthService]

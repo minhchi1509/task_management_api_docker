@@ -1,7 +1,3 @@
-export enum ERoomActions {
-  GET_MEMBER = 'GET_ROOM_MEMBER'
-}
-
 export enum ETaskTypeActions {
   READ = 'READ_TASK_TYPE',
   CREATE = 'CREATE_TASK_TYPE',
@@ -33,4 +29,8 @@ export enum ETaskCommentActions {
   CREATE = 'CREATE_COMMENT',
   UPDATE = 'UPDATE_COMMENT',
   DELETE = 'DELETE_COMMENT'
+}
+
+export enum ERoomActions {
+  GET_MEMBER = 'GET_ROOM_MEMBER'
 }

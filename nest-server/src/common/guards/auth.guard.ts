@@ -7,10 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
-import {
-  EMetadataKey,
-  ERequestPayloadKey
-} from 'src/common/constants/common.enum';
+import { EMetadataKey } from 'src/common/constants/common.enum';
+import { IRequest } from 'src/common/types/common.type';
 import { TokenService } from 'src/modules/libs/token/token.service';
 
 @Injectable()
@@ -29,7 +27,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<IRequest>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException('Token is required');
@@ -39,7 +37,7 @@ export class AuthGuard implements CanActivate {
     if (!accessTokenPayload) {
       throw new UnauthorizedException('Invalid token');
     }
-    request[ERequestPayloadKey.USER] = accessTokenPayload;
+    request.user = accessTokenPayload;
 
     return true;
   }

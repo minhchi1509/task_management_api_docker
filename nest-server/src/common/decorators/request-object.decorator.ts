@@ -1,8 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
-import { ERequestPayloadKey } from 'src/common/constants/common.enum';
-import { TJWTPayload } from 'src/common/types/token.type';
+import { IRequest } from 'src/common/types/common.type';
 
 export const RequestHeader = createParamDecorator(
   async (targetDTO: any, ctx: ExecutionContext) => {
@@ -14,8 +13,8 @@ export const RequestHeader = createParamDecorator(
 
 export const UserId = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
-    const request = context.switchToHttp().getRequest();
-    const user: TJWTPayload = request[ERequestPayloadKey.USER];
+    const request = context.switchToHttp().getRequest<IRequest>();
+    const user = request.user;
     return user.sub;
   }
 );

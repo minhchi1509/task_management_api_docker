@@ -10,7 +10,7 @@ export const UseFormData = () => {
 
 export const ApiExceptionResponse = (options?: {
   type: Type<unknown>;
-  status: HttpStatus;
+  status?: HttpStatus;
 }) => {
   return applyDecorators(
     ApiResponse({
