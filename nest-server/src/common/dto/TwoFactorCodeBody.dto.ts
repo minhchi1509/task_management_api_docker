@@ -1,5 +1,4 @@
 import {
-  IsNotEmpty,
   IsNumberString,
   IsOptional,
   Length,
@@ -14,6 +13,5 @@ export class TwoFactorCodeBodyDTO {
   @Trim()
   @Length(6, 6)
   @IsNumberString()
-  @IsNotEmpty()
   otpCode?: string;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
@@ -8,12 +8,14 @@ import {
 } from 'src/common/decorators/common.decorator';
 import { UserId } from 'src/common/decorators/request-object.decorator';
 import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
+import { UserResponseDTO } from 'src/common/dto/UserResponse.dto';
+import { DisabledTwoFABodyDTO } from 'src/modules/apis/user/dto/2fa/DisabledTwoFABody.dto';
 import { EnableTwoFABodyDTO } from 'src/modules/apis/user/dto/2fa/EnableTwoFABody.dto';
 import { GenerateTwoFAResponseDTO } from 'src/modules/apis/user/dto/2fa/GenerateTwoFAResponse.dto';
 import { ModifyTwoFAResponseDTO } from 'src/modules/apis/user/dto/2fa/ModifyTwoFAResponse.dto';
-import { ChangeAvatarBodyDTO } from 'src/modules/apis/user/dto/change-avatar/ChangeAvatarBody.dto';
-import { ChangeAvatarResponseDTO } from 'src/modules/apis/user/dto/change-avatar/ChangeAvatarResponse.dto';
 import { ChangePasswordBodyDTO } from 'src/modules/apis/user/dto/change-password/ChangePasswordBody.dto';
+import { UpdateProfileBodyDTO } from 'src/modules/apis/user/dto/update-profile/UpdateProfileBody.dto';
+import { UpdateProfileResponseDTO } from 'src/modules/apis/user/dto/update-profile/UpdateProfileResponse.dto';
 import { UserService } from 'src/modules/apis/user/user.service';
 
 @ApiTags('User')
@@ -23,17 +25,23 @@ import { UserService } from 'src/modules/apis/user/user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Put('change-avatar')
-  @UseFormData()
-  async changeAvatar(
-    @Body() body: ChangeAvatarBodyDTO,
-    @UserId() userId: string
-  ): Promise<ChangeAvatarResponseDTO> {
-    const response = await this.userService.changeAvatar(userId, body);
-    return plainToInstance(ChangeAvatarResponseDTO, response);
+  @Get('profile')
+  async profile(@UserId() userId: string): Promise<UserResponseDTO> {
+    const response = await this.userService.getProfile(userId);
+    return plainToInstance(UserResponseDTO, response);
   }
 
-  @Put('change-password')
+  @Put('profile')
+  @UseFormData()
+  async editProfile(
+    @Body() body: UpdateProfileBodyDTO,
+    @UserId() userId: string
+  ): Promise<UpdateProfileResponseDTO> {
+    const response = await this.userService.editProfile(userId, body);
+    return plainToInstance(UpdateProfileResponseDTO, response);
+  }
+
+  @Put('password')
   async changePassword(
     @Body() body: ChangePasswordBodyDTO,
     @UserId() userId: string
@@ -42,7 +50,7 @@ export class UserController {
     return plainToInstance(MessageResponseDTO, response);
   }
 
-  @Post('generate-2fa')
+  @Get('generate-2fa')
   async generateTwoFA(
     @UserId() userId: string
   ): Promise<GenerateTwoFAResponseDTO> {
@@ -62,9 +70,16 @@ export class UserController {
 
   @Put('disable-2fa')
   async disableTwoFA(
+    @Body() body: DisabledTwoFABodyDTO,
     @UserId() userId: string
   ): Promise<ModifyTwoFAResponseDTO> {
-    const response = await this.userService.disableTwoFA(userId);
+    const response = await this.userService.disableTwoFA(body, userId);
     return plainToInstance(ModifyTwoFAResponseDTO, response);
+  }
+
+  @Post('logout')
+  async logout(@UserId() userId: string): Promise<MessageResponseDTO> {
+    const response = await this.userService.logout(userId);
+    return plainToInstance(MessageResponseDTO, response);
   }
 }

@@ -1,24 +1,21 @@
 import {
   Body,
   Controller,
-  Headers,
   HttpCode,
   HttpStatus,
   Post,
-  Put,
-  ValidationPipe
+  Put
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { ApiExceptionResponse } from 'src/common/decorators/common.decorator';
 import { PublicRoute } from 'src/common/decorators/metadata.decorator';
-import { RequestHeader } from 'src/common/decorators/request-object.decorator';
 import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
 import { LoginBodyDTO } from 'src/modules/apis/auth/dto/login/LoginBody.dto';
 import { LoginExceptionResponseDTO } from 'src/modules/apis/auth/dto/login/LoginExceptionResponse.dto';
 import { LoginResponseDTO } from 'src/modules/apis/auth/dto/login/LoginResponse.dto';
-import { RefreshTokenHeaderDTO } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenHeader.dto';
+import { RefreshTokenBodyDTO } from 'src/modules/apis/auth/dto/refresh-token/RefreshTokenBody.dto';
 import { ResetPasswordBodyDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordBody.dto';
 import { ResetPasswordResponseDto } from 'src/modules/apis/auth/dto/reset-password/ResetPasswordResponse.dto';
 import { SendResetPasswordMailBodyDto } from 'src/modules/apis/auth/dto/send-reset-password-mail/SendResetPasswordMailBody.dto';
@@ -71,17 +68,9 @@ export class AuthController {
   @ApiExceptionResponse()
   @Post('refresh-token')
   async refreshToken(
-    @Headers()
-    @RequestHeader(
-      new ValidationPipe({
-        validateCustomDecorators: true,
-        transform: true,
-        stopAtFirstError: true
-      })
-    )
-    headers: RefreshTokenHeaderDTO
+    @Body() body: RefreshTokenBodyDTO
   ): Promise<LoginResponseDTO> {
-    const { refreshToken } = headers;
+    const { refreshToken } = body;
     const response = await this.authService.refreshToken(refreshToken);
     return plainToInstance(LoginResponseDTO, response);
   }

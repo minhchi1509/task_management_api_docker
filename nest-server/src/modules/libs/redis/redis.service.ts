@@ -39,6 +39,10 @@ export class RedisService {
     return refreshToken;
   };
 
+  deleteUserRefreshToken = async (userId: string) => {
+    await this.redis.del(`refresh_token:${userId}`);
+  };
+
   setFilePublicId = async (encodeURL: string, publicId: string) => {
     await this.redis.set(`file_public_id:${encodeURL}`, publicId);
   };

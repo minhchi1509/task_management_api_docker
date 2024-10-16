@@ -9,11 +9,13 @@ import qrcode from 'qrcode';
 
 import { DEFAULT_USER_AVATAR_URL } from 'src/common/constants/common.constant';
 import { MessageResponseDTO } from 'src/common/dto/MessageResponse.dto';
+import { UserResponseDTO } from 'src/common/dto/UserResponse.dto';
+import { DisabledTwoFABodyDTO } from 'src/modules/apis/user/dto/2fa/DisabledTwoFABody.dto';
 import { GenerateTwoFAResponseDTO } from 'src/modules/apis/user/dto/2fa/GenerateTwoFAResponse.dto';
 import { ModifyTwoFAResponseDTO } from 'src/modules/apis/user/dto/2fa/ModifyTwoFAResponse.dto';
-import { ChangeAvatarBodyDTO } from 'src/modules/apis/user/dto/change-avatar/ChangeAvatarBody.dto';
-import { ChangeAvatarResponseDTO } from 'src/modules/apis/user/dto/change-avatar/ChangeAvatarResponse.dto';
 import { ChangePasswordBodyDTO } from 'src/modules/apis/user/dto/change-password/ChangePasswordBody.dto';
+import { UpdateProfileBodyDTO } from 'src/modules/apis/user/dto/update-profile/UpdateProfileBody.dto';
+import { UpdateProfileResponseDTO } from 'src/modules/apis/user/dto/update-profile/UpdateProfileResponse.dto';
 import { BcryptService } from 'src/modules/libs/bcrypt/bcrypt.service';
 import { CloudinaryService } from 'src/modules/libs/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/modules/libs/prisma/prisma.service';
@@ -28,38 +30,57 @@ export class UserService {
     private redisService: RedisService
   ) {}
 
-  changeAvatar = async (
+  editProfile = async (
     userId: string,
-    body: ChangeAvatarBodyDTO
-  ): Promise<ChangeAvatarResponseDTO> => {
-    const { avatar } = body;
+    body: UpdateProfileBodyDTO
+  ): Promise<UpdateProfileResponseDTO> => {
+    const { avatar, fullName } = body;
     const user = await this.prismaService.user
       .findUniqueOrThrow({ where: { id: userId } })
       .catch(() => {
         throw new NotFoundException('User not found');
       });
-    const currentUserAvatarURL = user.avatar;
-    if (currentUserAvatarURL !== DEFAULT_USER_AVATAR_URL) {
-      await this.cloudinaryService.deleteFileByUrl(currentUserAvatarURL);
+    let uploadAvatarResponse;
+    if (avatar) {
+      const currentUserAvatarURL = user.avatar;
+      if (currentUserAvatarURL !== DEFAULT_USER_AVATAR_URL) {
+        await this.cloudinaryService.deleteFileByUrl(currentUserAvatarURL);
+      }
+      uploadAvatarResponse = await this.cloudinaryService.uploadFile(avatar, {
+        folder: 'avatar'
+      });
     }
-    const uploadAvatarResponse = await this.cloudinaryService.uploadFile(
-      avatar,
-      { folder: 'avatar' }
-    );
     const updatedUser = await this.prismaService.user.update({
       where: { id: userId },
       data: {
-        avatar: uploadAvatarResponse.secure_url
+        ...(fullName && { fullName }),
+        ...(uploadAvatarResponse && { avatar: uploadAvatarResponse.secure_url })
       }
     });
-    return updatedUser;
+    return {
+      message: 'Update profile successfully',
+      updatedUser
+    };
   };
 
   changePassword = async (
     userId: string,
     body: ChangePasswordBodyDTO
   ): Promise<MessageResponseDTO> => {
-    const { newPassword } = body;
+    const { newPassword, oldPassword } = body;
+
+    const user = await this.prismaService.user
+      .findFirstOrThrow({ where: { id: userId } })
+      .catch(() => {
+        throw new NotFoundException('User not found');
+      });
+    const isPasswordMatched = await this.bcryptService.isMatch(
+      oldPassword,
+      user.password
+    );
+    if (!isPasswordMatched) {
+      throw new BadRequestException('Old password is incorrect');
+    }
     const hashedPassword = await this.bcryptService.hash(newPassword);
     const updatedUser = await this.prismaService.user.update({
       where: { id: userId },
@@ -143,7 +164,11 @@ export class UserService {
     };
   };
 
-  disableTwoFA = async (userId: string): Promise<ModifyTwoFAResponseDTO> => {
+  disableTwoFA = async (
+    body: DisabledTwoFABodyDTO,
+    userId: string
+  ): Promise<ModifyTwoFAResponseDTO> => {
+    const { password } = body;
     const user = await this.prismaService.user
       .findFirstOrThrow({ where: { id: userId } })
       .catch(() => {
@@ -154,6 +179,15 @@ export class UserService {
       throw new BadRequestException(
         'Two-factor authentication has not been enabled'
       );
+    }
+
+    const isPasswordMatched = await this.bcryptService.isMatch(
+      password,
+      user.password
+    );
+
+    if (!isPasswordMatched) {
+      throw new BadRequestException('Password is incorrect');
     }
 
     const updatedUser = await this.prismaService.user.update({
@@ -168,5 +202,21 @@ export class UserService {
       user: updatedUser,
       message: 'Disable two-factor authentication successfully'
     };
+  };
+
+  logout = async (userId: string): Promise<MessageResponseDTO> => {
+    await this.redisService.deleteUserRefreshToken(userId);
+    return {
+      message: 'Logout successfully'
+    };
+  };
+
+  getProfile = async (userId: string): Promise<UserResponseDTO> => {
+    const user = await this.prismaService.user
+      .findFirstOrThrow({ where: { id: userId } })
+      .catch(() => {
+        throw new NotFoundException('User not found');
+      });
+    return user;
   };
 }

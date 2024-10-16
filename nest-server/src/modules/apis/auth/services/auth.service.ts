@@ -143,13 +143,21 @@ export class AuthService {
         throw new NotFoundException('Email is not associated with any account');
       });
 
+    const currentResetPasswordToken =
+      await this.redisService.getResetPasswordToken(email);
+    if (currentResetPasswordToken) {
+      throw new BadRequestException(
+        'A reset password mail has been sent to your email already. Please check your email or try again after 5 minutes'
+      );
+    }
+
     const resetPasswordTokenPayload: TJWTResetPasswordPayload = {
       email
     };
     const resetPasswordToken = await this.tokenService.signResetPasswordToken(
       resetPasswordTokenPayload
     );
-    const resetPasswordUrl = `${this.configService.get<string>('CLIENT_URL')}/reset-password?token=${resetPasswordToken}`;
+    const resetPasswordUrl = `${this.configService.get<string>('CLIENT_URL')}/reset-password?reset_password_token=${resetPasswordToken}`;
 
     const resetPasswordMailData: TResetPasswordMailData = {
       to: email,
@@ -172,13 +180,13 @@ export class AuthService {
     const decodeResetPasswordToken =
       await this.tokenService.verifyResetPasswordToken(token);
     if (!decodeResetPasswordToken) {
-      throw new BadRequestException('Reset password token is invalid');
+      throw new BadRequestException('Reset password link is expired');
     }
     const resetPasswordToken = await this.redisService.getResetPasswordToken(
       decodeResetPasswordToken.email
     );
     if (!resetPasswordToken) {
-      throw new BadRequestException('Reset password token is expired');
+      throw new BadRequestException('Reset password link is expired');
     }
     const hashedPassword = await this.bcryptService.hash(newPassword);
     const updatedUser = await this.prismaService.user.update({
